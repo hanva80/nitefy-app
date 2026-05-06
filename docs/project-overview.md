@@ -22,6 +22,10 @@ The strongest version of NITEFY can connect to a music app such as Spotify or Ap
 
 NITEFY is not primarily a social app for finding people to go out with. Social features may exist later, but the main value is venue recommendation.
 
+## Core User Need
+
+Users want to know where to go tonight without wasting time comparing random options. They want a place that matches their mood, music taste, group situation, budget, dress code, and location.
+
 ## Initial Target Audience
 
 - People aged 18-28
@@ -29,3 +33,7 @@ NITEFY is not primarily a social app for finding people to go out with. Social f
 - Tourists and people new to a city
 - Users looking for last-minute nightlife options
 - Young people in Germany, starting with NRW and Düsseldorf
+
+## Key Product Promise
+
+NITEFY makes nightlife discovery faster, more personal, and more visual.

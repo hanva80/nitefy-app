@@ -24,11 +24,21 @@ NITEFY is a young, intuitive, visual, and practical nightlife discovery product.
 
 ## Tone of Voice
 
-NITEFY should sound direct, modern, and easy to understand.
+NITEFY should sound direct, modern, and easy to understand. The communication should avoid sounding too corporate or too technical.
+
+### Example Tone
+
+Instead of:
+
+> Discover nightlife venues based on advanced user preference analysis.
 
 Use:
 
 > Find the place that actually fits your night.
+
+## Core Message
+
+NITEFY helps users stop guessing and start choosing the right place for their night.
 
 ## UX Principles
 
