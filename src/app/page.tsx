@@ -3,6 +3,7 @@
 import { LocateFixed, MapPin, Navigation, SlidersHorizontal, Sparkles } from "lucide-react";
 import { OptionPill } from "@/components/option-pill";
 import { VenueCard } from "@/components/venue-card";
+import { musicTasteProfiles } from "@/data/music-taste-profiles";
 import {
   budgetOptions,
   contextOptions,
@@ -13,7 +14,17 @@ import {
 } from "@/data/preference-options";
 import { venues } from "@/data/venues";
 import { defaultProfile, getRecommendedVenues } from "@/lib/recommendation-engine";
-import type { Budget, DressCode, GroupContext, MusicStyle, PreferenceProfile, VenueType, Vibe } from "@/lib/types";
+import type {
+  Budget,
+  DressCode,
+  GroupContext,
+  MusicProvider,
+  MusicStyle,
+  MusicTasteProfile,
+  PreferenceProfile,
+  VenueType,
+  Vibe
+} from "@/lib/types";
 import type { ReactNode } from "react";
 import { useMemo, useState } from "react";
 
@@ -24,6 +35,7 @@ export default function Home() {
   const [city, setCity] = useState("Düsseldorf");
   const [locationStatus, setLocationStatus] = useState("Using sample nightlife data");
   const [isLocating, setIsLocating] = useState(false);
+  const [musicTaste, setMusicTaste] = useState<MusicTasteProfile | null>(null);
   const recommendations = useMemo(() => getRecommendedVenues(venues, profile), [profile]);
 
   function toggleMusic(style: MusicStyle) {
@@ -61,6 +73,16 @@ export default function Home() {
     );
   }
 
+  function analyzeMusicTaste(provider: MusicProvider) {
+    const taste = musicTasteProfiles[provider];
+    setMusicTaste(taste);
+    setProfile((current) => ({
+      ...current,
+      music: taste.topGenres,
+      vibe: taste.energy
+    }));
+  }
+
   return (
     <main>
       <section className="mx-auto grid min-h-screen w-full max-w-7xl gap-8 px-4 py-5 sm:px-6 lg:grid-cols-[0.92fr_1.08fr] lg:px-8">
@@ -83,7 +105,7 @@ export default function Home() {
                 Find the place that actually fits your night.
               </h1>
               <p className="mt-5 text-lg leading-8 text-white/72">
-                Pick your music, vibe, budget and dress code. NITEFY shows nightlife spots that match what you want tonight.
+                Connect your music taste or pick the vibe manually. NITEFY turns that into nightlife recommendations for tonight.
               </p>
             </div>
           </div>
@@ -123,11 +145,59 @@ export default function Home() {
         </div>
 
         <div className="space-y-5">
+          <section className="rounded-lg border border-lime/24 bg-lime/10 p-4 sm:p-5">
+            <div className="mb-4 flex items-start justify-between gap-4">
+              <div>
+                <p className="text-xs font-bold uppercase text-lime">Music taste scan</p>
+                <h2 className="mt-1 text-2xl font-black text-white">Start with what you actually play.</h2>
+              </div>
+              <Sparkles className="shrink-0 text-lime" />
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-2">
+              {(["Spotify", "Apple Music"] as MusicProvider[]).map((provider) => (
+                <button
+                  key={provider}
+                  type="button"
+                  onClick={() => analyzeMusicTaste(provider)}
+                  className={`rounded-lg border p-4 text-left transition ${
+                    musicTaste?.provider === provider
+                      ? "border-lime bg-lime text-night"
+                      : "border-white/12 bg-night/55 text-white hover:border-lime/60"
+                  }`}
+                >
+                  <span className="text-sm font-black">{provider}</span>
+                  <span className={`mt-2 block text-sm leading-6 ${musicTaste?.provider === provider ? "text-night/72" : "text-white/64"}`}>
+                    Demo analysis for MVP testing
+                  </span>
+                </button>
+              ))}
+            </div>
+
+            {musicTaste ? (
+              <div className="mt-4 rounded-lg border border-white/10 bg-night/55 p-4">
+                <p className="text-sm font-black text-white">{musicTaste.provider} taste profile</p>
+                <p className="mt-2 text-sm leading-6 text-white/72">{musicTaste.summary}</p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {musicTaste.signals.map((signal) => (
+                    <span key={signal} className="rounded-full bg-white/[0.08] px-3 py-1 text-xs font-bold text-white/78">
+                      {signal}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <p className="mt-4 text-sm leading-6 text-white/68">
+                For the MVP this simulates Spotify or Apple Music. Real login comes after we validate that users want music-based recommendations.
+              </p>
+            )}
+          </section>
+
           <section className="rounded-lg border border-white/10 bg-white/[0.07] p-4 sm:p-5">
             <div className="mb-5 flex items-center justify-between gap-3">
               <div>
-                <p className="text-xs font-bold uppercase text-lime">Quick preference profile</p>
-                <h2 className="mt-1 text-2xl font-black text-white">What kind of night?</h2>
+                <p className="text-xs font-bold uppercase text-lime">Tune the profile</p>
+                <h2 className="mt-1 text-2xl font-black text-white">Adjust your night.</h2>
               </div>
               <SlidersHorizontal className="text-cyan" />
             </div>

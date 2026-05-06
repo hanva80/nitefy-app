@@ -17,6 +17,7 @@ Open `http://localhost:3000`.
 ## Current MVP Notes
 
 - Venue data is local mock data in `src/data/venues.ts`.
+- Music taste analysis is simulated in `src/data/music-taste-profiles.ts`.
 - Recommendation logic is local and transparent in `src/lib/recommendation-engine.ts`.
 - Location uses browser geolocation when available, with manual city fallback.
 - Supabase is intentionally not included yet.

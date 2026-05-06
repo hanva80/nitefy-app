@@ -9,9 +9,9 @@ You are going out tonight with friends in Düsseldorf and nobody knows where to 
 ## Tasks
 
 1. Open NITEFY.
-2. Set your music preference.
-3. Pick the vibe you want tonight.
-4. Set your budget and dress code comfort.
+2. Use the Spotify or Apple Music demo analysis.
+3. Check whether the generated taste profile feels understandable.
+4. Adjust music, vibe, budget or dress code if needed.
 5. Choose a recommendation.
 6. Open the venue detail page.
 
@@ -19,9 +19,10 @@ You are going out tonight with friends in Düsseldorf and nobody knows where to 
 
 1. What do you think NITEFY does?
 2. Why do you think the first venue was recommended?
-3. What information helped you decide?
-4. What information was missing?
-5. Would you use this before going out tonight?
+3. Does connecting music taste feel useful or unnecessary?
+4. What information helped you decide?
+5. What information was missing?
+6. Would you use this before going out tonight?
 
 ## What To Watch
 
