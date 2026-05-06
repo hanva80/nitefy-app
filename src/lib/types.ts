@@ -28,6 +28,11 @@ export type MusicTasteProfile = {
   energy: Vibe;
   summary: string;
   signals: string[];
+  confidence: number;
+  topArtists: string[];
+  listeningWindow: string;
+  nightlifeTranslation: string;
+  recommendationImpact: string[];
 };
 
 export type PreferenceProfile = {

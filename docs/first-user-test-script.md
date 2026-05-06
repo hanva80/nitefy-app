@@ -28,6 +28,7 @@ You are going out tonight with friends in Düsseldorf and nobody knows where to 
 
 - Do users understand the product in under 10 seconds?
 - Do they trust the match reasons?
+- Does the simulated music scan feel believable enough for an MVP?
 - Do visuals help them understand the vibe?
 - Does location feel clear enough?
 - Are the cards too detailed or too light?

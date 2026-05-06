@@ -6,6 +6,7 @@ import {
   MapPin,
   Music2,
   Navigation,
+  Radio,
   SlidersHorizontal,
   Sparkles
 } from "lucide-react";
@@ -44,6 +45,8 @@ export default function Home() {
   const [locationStatus, setLocationStatus] = useState("Düsseldorf MVP data");
   const [isLocating, setIsLocating] = useState(false);
   const [musicTaste, setMusicTaste] = useState<MusicTasteProfile | null>(null);
+  const [scanStatus, setScanStatus] = useState<"idle" | "scanning" | "complete">("idle");
+  const [activeProvider, setActiveProvider] = useState<MusicProvider | null>(null);
   const recommendations = useMemo(() => getRecommendedVenues(venues, profile), [profile]);
   const bestMatch = recommendations[0];
 
@@ -84,12 +87,19 @@ export default function Home() {
 
   function analyzeMusicTaste(provider: MusicProvider) {
     const taste = musicTasteProfiles[provider];
-    setMusicTaste(taste);
-    setProfile((current) => ({
-      ...current,
-      music: taste.topGenres,
-      vibe: taste.energy
-    }));
+    setActiveProvider(provider);
+    setMusicTaste(null);
+    setScanStatus("scanning");
+
+    window.setTimeout(() => {
+      setMusicTaste(taste);
+      setScanStatus("complete");
+      setProfile((current) => ({
+        ...current,
+        music: taste.topGenres,
+        vibe: taste.energy
+      }));
+    }, 900);
   }
 
   return (
@@ -116,7 +126,7 @@ export default function Home() {
               <StepLabel number="1" label="Music taste" icon={<Headphones size={17} />} />
               <h1 className="mt-3 text-3xl font-black leading-tight text-white">Start with your music.</h1>
               <p className="mt-3 text-sm leading-6 text-white/68">
-                Pick a music app demo. NITEFY turns your taste into venue matches you can adjust.
+                Simulate a secure music scan. NITEFY reads your recent sound and translates it into nightlife matches.
               </p>
 
               <div className="mt-4 grid gap-2">
@@ -125,27 +135,61 @@ export default function Home() {
                     key={provider}
                     type="button"
                     onClick={() => analyzeMusicTaste(provider)}
+                    disabled={scanStatus === "scanning"}
                     className={`rounded-lg border p-4 text-left transition ${
-                      musicTaste?.provider === provider
+                      musicTaste?.provider === provider || activeProvider === provider
                         ? "border-lime bg-lime text-night"
                         : "border-white/12 bg-night/55 text-white hover:border-lime/60"
-                    }`}
+                    } ${scanStatus === "scanning" ? "cursor-wait opacity-90" : ""}`}
                   >
                     <span className="flex items-center justify-between gap-3">
                       <span className="text-base font-black">{provider}</span>
                       <Music2 size={18} />
                     </span>
-                    <span className={`mt-1 block text-sm ${musicTaste?.provider === provider ? "text-night/70" : "text-white/58"}`}>
-                      Demo scan for MVP testing
+                    <span className={`mt-1 block text-sm ${musicTaste?.provider === provider || activeProvider === provider ? "text-night/70" : "text-white/58"}`}>
+                      {activeProvider === provider && scanStatus === "scanning" ? "Analyzing taste..." : "Preview music-based matching"}
                     </span>
                   </button>
                 ))}
               </div>
 
+              {scanStatus === "scanning" ? (
+                <div className="mt-4 rounded-lg border border-lime/30 bg-lime/10 p-4">
+                  <div className="mb-3 flex items-center gap-2 text-sm font-black text-lime">
+                    <Radio size={16} />
+                    Scanning {activeProvider}
+                  </div>
+                  <ScanStep label="Reading recent genres" active />
+                  <ScanStep label="Detecting nightlife energy" active />
+                  <ScanStep label="Matching venues nearby" active />
+                </div>
+              ) : null}
+
               {musicTaste ? (
                 <div className="mt-4 border-t border-white/10 pt-4">
-                  <p className="text-sm font-black text-white">{musicTaste.provider} profile</p>
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="text-sm font-black text-white">{musicTaste.provider} taste profile</p>
+                      <p className="mt-1 text-xs font-bold text-white/48">{musicTaste.listeningWindow}</p>
+                    </div>
+                    <div className="rounded-lg bg-lime px-3 py-2 text-right text-night">
+                      <p className="text-[10px] font-black uppercase">Confidence</p>
+                      <p className="text-lg font-black">{musicTaste.confidence}%</p>
+                    </div>
+                  </div>
                   <p className="mt-2 text-sm leading-6 text-white/70">{musicTaste.summary}</p>
+
+                  <div className="mt-4">
+                    <p className="text-xs font-black uppercase text-cyan">Top artists signal</p>
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {musicTaste.topArtists.map((artist) => (
+                        <span key={artist} className="rounded-full bg-cyan/10 px-3 py-1 text-xs font-bold text-cyan">
+                          {artist}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
                   <div className="mt-3 flex flex-wrap gap-2">
                     {musicTaste.signals.map((signal) => (
                       <span key={signal} className="rounded-full bg-white/[0.08] px-3 py-1 text-xs font-bold text-white/78">
@@ -153,6 +197,8 @@ export default function Home() {
                       </span>
                     ))}
                   </div>
+
+                  <p className="mt-4 text-sm leading-6 text-white/74">{musicTaste.nightlifeTranslation}</p>
                 </div>
               ) : null}
             </section>
@@ -291,7 +337,7 @@ export default function Home() {
                   </h2>
                   <p className="mt-2 max-w-2xl text-sm leading-6 text-white/64">
                     {musicTaste
-                      ? "Recommendations update instantly from your music, budget, distance and location."
+                      ? musicTaste.nightlifeTranslation
                       : "You can still use the manual filters, but the clearest NITEFY experience starts with music taste."}
                   </p>
                 </div>
@@ -310,6 +356,16 @@ export default function Home() {
                 <span className="rounded-full bg-white/[0.08] px-3 py-1 text-xs font-bold text-white/78">{profile.budget} budget</span>
                 <span className="rounded-full bg-white/[0.08] px-3 py-1 text-xs font-bold text-white/78">{profile.distanceKm} km radius</span>
               </div>
+
+              {musicTaste ? (
+                <div className="mt-4 grid gap-2 sm:grid-cols-3">
+                  {musicTaste.recommendationImpact.map((impact) => (
+                    <div key={impact} className="rounded-lg border border-white/10 bg-white/[0.05] p-3 text-sm font-semibold leading-5 text-white/72">
+                      {impact}
+                    </div>
+                  ))}
+                </div>
+              ) : null}
             </div>
 
             <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
@@ -338,6 +394,15 @@ function StepLabel({ number, label, icon }: { number: string; label: string; ico
       <span className="grid h-6 w-6 place-items-center rounded-full bg-lime text-night">{number}</span>
       <span className="text-lime">{label}</span>
       <span className="text-cyan">{icon}</span>
+    </div>
+  );
+}
+
+function ScanStep({ label, active }: { label: string; active: boolean }) {
+  return (
+    <div className="mb-2 flex items-center gap-3 text-sm font-semibold text-white/76">
+      <span className={`h-2.5 w-2.5 rounded-full ${active ? "bg-lime shadow-glow" : "bg-white/20"}`} />
+      {label}
     </div>
   );
 }

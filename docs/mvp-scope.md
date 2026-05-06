@@ -12,6 +12,16 @@ NITEFY should make music taste feel like a primary input. The MVP can start with
 
 The first validation version can simulate this analysis before adding real OAuth and API integrations.
 
+The simulated scan should still feel believable. It should show:
+
+- The selected provider
+- A short scanning state
+- Recent listening window
+- Top genres
+- Top artist signals
+- Confidence score
+- How the music taste changed the recommendations
+
 ### 2. Quick Preference Profile
 
 The user answers a short set of questions to define what kind of night they are looking for.
