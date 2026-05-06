@@ -1,4 +1,5 @@
 import { Clock, MapPin, Shirt, Star, Ticket } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import type { VenueMatch } from "@/lib/types";
 
@@ -11,7 +12,13 @@ export function VenueCard({ venue, featured = false }: VenueCardProps) {
   return (
     <article className={`overflow-hidden rounded-lg border border-white/12 bg-white/[0.06] ${featured ? "lg:col-span-2" : ""}`}>
       <div className="relative min-h-[260px]">
-        <img src={venue.image} alt={`${venue.name} atmosphere`} className="absolute inset-0 h-full w-full object-cover" />
+        <Image
+          src={venue.image}
+          alt={`${venue.name} atmosphere`}
+          fill
+          sizes={featured ? "(min-width: 1024px) 66vw, 100vw" : "(min-width: 1024px) 33vw, 100vw"}
+          className="object-cover"
+        />
         <div className="absolute inset-0 bg-gradient-to-t from-night via-night/25 to-transparent" />
         <div className="absolute left-4 top-4 rounded-full bg-lime px-3 py-1 text-xs font-black text-night">
           {venue.matchScore}% match

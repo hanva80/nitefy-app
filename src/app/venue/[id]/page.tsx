@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowLeft, Clock, MapPin, Music, Shirt, Star, Ticket } from "lucide-react";
+import Image from "next/image";
 import type { ReactNode } from "react";
 import { venues } from "@/data/venues";
 import { defaultProfile, getRecommendedVenues } from "@/lib/recommendation-engine";
@@ -25,7 +26,14 @@ export default function VenuePage({ params }: VenuePageProps) {
   return (
     <main className="min-h-screen">
       <section className="relative min-h-[58vh] overflow-hidden">
-        <img src={venue.image} alt={`${venue.name} vibe preview`} className="absolute inset-0 h-full w-full object-cover" />
+        <Image
+          src={venue.image}
+          alt={`${venue.name} vibe preview`}
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover"
+        />
         <div className="absolute inset-0 bg-gradient-to-t from-night via-night/35 to-night/15" />
         <div className="relative mx-auto flex min-h-[58vh] max-w-6xl flex-col justify-between px-4 py-6 sm:px-6 lg:px-8">
           <Link href="/" className="inline-flex w-fit items-center gap-2 rounded-full bg-white/12 px-4 py-2 text-sm font-bold text-white backdrop-blur">
