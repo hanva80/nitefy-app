@@ -32,5 +32,21 @@ export const musicTasteProfiles: Record<MusicTasteProfile["provider"], MusicTast
       "Prioritizes dance-friendly energy",
       "Pushes relaxed events above strict clubs"
     ]
+  },
+  SoundCloud: {
+    provider: "SoundCloud",
+    topGenres: ["Techno", "House", "Hip-hop"],
+    energy: "Underground",
+    summary: "Your SoundCloud-style profile points to edits, DJ sets and less obvious nightlife choices.",
+    signals: ["Electronic sets", "Underground edits", "Bass-heavy discoveries"],
+    confidence: 82,
+    topArtists: ["Keinemusik", "Fred again..", "Kaytranada", "Skepta"],
+    listeningWindow: "Recent likes and plays preview",
+    nightlifeTranslation: "Best for rooms with stronger music identity, DJ-led energy and fewer generic chart moments.",
+    recommendationImpact: [
+      "Boosts underground, house and techno venues",
+      "Prioritizes music-led events over polished lounges",
+      "Keeps mainstream bars lower unless the vibe is strong"
+    ]
   }
 };

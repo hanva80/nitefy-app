@@ -68,7 +68,8 @@ export function HomeClient({ initialVenues }: HomeClientProps) {
       const response = await fetch("/api/spotify/taste");
 
       if (!response.ok) {
-        throw new Error("Spotify taste unavailable");
+        const errorPayload = (await response.json().catch(() => null)) as { error?: string; hint?: string } | null;
+        throw new Error(errorPayload?.hint ?? "Spotify is connected, but your taste profile could not be loaded.");
       }
 
       const data = (await response.json()) as {
@@ -87,9 +88,10 @@ export function HomeClient({ initialVenues }: HomeClientProps) {
         music: data.profile.topGenres,
         vibe: data.profile.energy
       }));
-    } catch {
+    } catch (error) {
       setScanStatus("idle");
-      setMusicError("Spotify is connected, but your taste profile could not be loaded.");
+      const errorMessage = error instanceof Error ? error.message : "Spotify is connected, but your taste profile could not be loaded.";
+      setMusicError(errorMessage);
     }
   }, []);
 
@@ -226,7 +228,7 @@ export function HomeClient({ initialVenues }: HomeClientProps) {
               </p>
 
               <div className="mt-5 grid gap-2">
-                {(["Spotify", "Apple Music"] as MusicProvider[]).map((provider) => (
+                {(["Spotify", "Apple Music", "SoundCloud"] as MusicProvider[]).map((provider) => (
                   <button
                     key={provider}
                     type="button"

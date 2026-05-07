@@ -35,11 +35,16 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your_supabase_publishable_key
 SPOTIFY_CLIENT_ID=your_spotify_client_id
 SPOTIFY_CLIENT_SECRET=your_spotify_client_secret
 SPOTIFY_REDIRECT_URI=http://localhost:3000/api/spotify/callback
+APPLE_MUSIC_TEAM_ID=planned_later
+APPLE_MUSIC_KEY_ID=planned_later
+SOUNDCLOUD_CLIENT_ID=planned_later
+SOUNDCLOUD_CLIENT_SECRET=planned_later
 ```
 
 The app proxies PostHog requests through `/ingest` to the EU PostHog endpoint.
 Run `supabase/schema.sql` in the Supabase SQL Editor to create and seed the MVP tables.
 Spotify OAuth requires the exact redirect URI above to be added in the Spotify Developer Dashboard for local testing. Production should use `https://nitefy-app.vercel.app/api/spotify/callback`.
+Apple Music and SoundCloud are represented in the provider model, but their real auth flows are planned after Spotify is stable.
 
 ## First Manual Test
 

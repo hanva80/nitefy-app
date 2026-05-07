@@ -20,7 +20,7 @@ export type Budget = "Low" | "Medium" | "High";
 export type DressCode = "Casual" | "Smart casual" | "Dressy";
 export type VenueType = "Club" | "Bar" | "Event" | "Lounge";
 export type GroupContext = "Friends" | "Date" | "Solo" | "Tourist";
-export type MusicProvider = "Spotify" | "Apple Music";
+export type MusicProvider = "Spotify" | "Apple Music" | "SoundCloud";
 
 export type MusicTasteProfile = {
   provider: MusicProvider;
