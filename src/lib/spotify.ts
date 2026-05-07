@@ -48,7 +48,7 @@ const genreSignals: Array<{
 
 export function buildSpotifyTasteProfile(artists: SpotifyArtist[], tracks: SpotifyTrack[]): MusicTasteProfile {
   const styleScores = new Map<MusicStyle, number>();
-  const rawGenres = artists.flatMap((artist) => artist.genres);
+  const rawGenres = artists.flatMap((artist) => artist.genres ?? []).filter(isNonEmptyString);
 
   rawGenres.forEach((genre) => {
     const normalizedGenre = genre.toLowerCase();
@@ -70,8 +70,8 @@ export function buildSpotifyTasteProfile(artists: SpotifyArtist[], tracks: Spoti
 
   const resolvedGenres: MusicStyle[] = topGenres.length > 0 ? topGenres : ["Charts", "Pop", "House"];
   const energy = getNightlifeVibe(resolvedGenres);
-  const topArtists = artists.slice(0, 4).map((artist) => artist.name);
-  const topTracks = tracks.slice(0, 3).map((track) => track.name);
+  const topArtists = artists.slice(0, 4).map((artist) => artist.name).filter(isNonEmptyString);
+  const topTracks = tracks.slice(0, 3).map((track) => track.name).filter(isNonEmptyString);
   const confidence = Math.min(96, 70 + artists.length * 2 + Math.min(rawGenres.length, 12));
 
   return {
@@ -134,4 +134,8 @@ function getNightlifeTranslation(genres: MusicStyle[], vibe: Vibe) {
   }
 
   return `Best for ${vibe.toLowerCase()} places with accessible music, visual energy and a crowd that fits your current taste.`;
+}
+
+function isNonEmptyString(value: unknown): value is string {
+  return typeof value === "string" && value.trim().length > 0;
 }

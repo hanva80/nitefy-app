@@ -43,8 +43,16 @@ export async function GET() {
     return spotifyError("spotify_profile_unavailable", getSpotifyHint(status), status);
   }
 
+  let profile;
+
+  try {
+    profile = buildSpotifyTasteProfile(artistsResponse.data.items ?? [], tracksResponse.data.items ?? []);
+  } catch {
+    return spotifyError("spotify_profile_parse_error", "Spotify connected, but the music data came back in an unexpected format. Try reconnecting Spotify.", 502);
+  }
+
   const response = NextResponse.json({
-    profile: buildSpotifyTasteProfile(artistsResponse.data.items, tracksResponse.data.items)
+    profile
   });
 
   if (refreshedToken) {
