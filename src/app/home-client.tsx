@@ -46,6 +46,21 @@ type HomeClientProps = {
   initialVenues: Venue[];
 };
 
+type MusicKitInstance = {
+  authorize: () => Promise<string>;
+};
+
+type MusicKitNamespace = {
+  configure: (options: { app: { build: string; name: string }; developerToken: string }) => MusicKitInstance;
+  getInstance: () => MusicKitInstance;
+};
+
+declare global {
+  interface Window {
+    MusicKit?: MusicKitNamespace;
+  }
+}
+
 export function HomeClient({ initialVenues }: HomeClientProps) {
   const [profile, setProfile] = useState<PreferenceProfile>(defaultProfile);
   const [city, setCity] = useState("Düsseldorf");
@@ -95,11 +110,120 @@ export function HomeClient({ initialVenues }: HomeClientProps) {
     }
   }, []);
 
+  const loadAppleMusicTaste = useCallback(async () => {
+    setActiveProvider("Apple Music");
+    setMusicTaste(null);
+    setMusicError(null);
+    setScanStatus("scanning");
+
+    try {
+      const tokenResponse = await fetch("/api/apple-music/developer-token");
+
+      if (!tokenResponse.ok) {
+        const errorPayload = (await tokenResponse.json().catch(() => null)) as { hint?: string } | null;
+        throw new Error(errorPayload?.hint ?? "Apple Music is not configured yet.");
+      }
+
+      const { developerToken } = (await tokenResponse.json()) as {
+        developerToken: string;
+      };
+
+      await loadAppleMusicScript();
+
+      const music = window.MusicKit?.configure({
+        app: {
+          build: "0.1.0",
+          name: "NITEFY"
+        },
+        developerToken
+      });
+
+      if (!music) {
+        throw new Error("Apple Music could not be started in this browser.");
+      }
+
+      const musicUserToken = await music.authorize();
+      const tasteResponse = await fetch("/api/apple-music/taste", {
+        body: JSON.stringify({
+          musicUserToken
+        }),
+        headers: {
+          "Content-Type": "application/json"
+        },
+        method: "POST"
+      });
+
+      if (!tasteResponse.ok) {
+        const errorPayload = (await tasteResponse.json().catch(() => null)) as { hint?: string } | null;
+        throw new Error(errorPayload?.hint ?? "Apple Music connected, but your taste profile could not be loaded.");
+      }
+
+      const data = (await tasteResponse.json()) as {
+        profile: MusicTasteProfile;
+      };
+
+      setMusicTaste(data.profile);
+      setScanStatus("complete");
+      captureEvent("Music Scan Completed", {
+        provider: "Apple Music",
+        confidence: data.profile.confidence,
+        topGenres: data.profile.topGenres.join(", ")
+      });
+      setProfile((current) => ({
+        ...current,
+        music: data.profile.topGenres,
+        vibe: data.profile.energy
+      }));
+    } catch (error) {
+      setScanStatus("idle");
+      const errorMessage = error instanceof Error ? error.message : "Apple Music connected, but your taste profile could not be loaded.";
+      setMusicError(errorMessage);
+    }
+  }, []);
+
+  const loadSoundCloudTaste = useCallback(async () => {
+    setActiveProvider("SoundCloud");
+    setMusicTaste(null);
+    setMusicError(null);
+    setScanStatus("scanning");
+
+    try {
+      const response = await fetch("/api/soundcloud/taste");
+
+      if (!response.ok) {
+        const errorPayload = (await response.json().catch(() => null)) as { hint?: string } | null;
+        throw new Error(errorPayload?.hint ?? "SoundCloud connected, but your taste profile could not be loaded.");
+      }
+
+      const data = (await response.json()) as {
+        profile: MusicTasteProfile;
+      };
+
+      setMusicTaste(data.profile);
+      setScanStatus("complete");
+      captureEvent("Music Scan Completed", {
+        provider: "SoundCloud",
+        confidence: data.profile.confidence,
+        topGenres: data.profile.topGenres.join(", ")
+      });
+      setProfile((current) => ({
+        ...current,
+        music: data.profile.topGenres,
+        vibe: data.profile.energy
+      }));
+    } catch (error) {
+      setScanStatus("idle");
+      const errorMessage = error instanceof Error ? error.message : "SoundCloud connected, but your taste profile could not be loaded.";
+      setMusicError(errorMessage);
+    }
+  }, []);
+
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const spotifyStatus = params.get("spotify");
+    const soundCloudStatus = params.get("soundcloud");
 
-    if (!spotifyStatus) {
+    if (!spotifyStatus && !soundCloudStatus) {
       return;
     }
 
@@ -110,10 +234,15 @@ export function HomeClient({ initialVenues }: HomeClientProps) {
       return;
     }
 
-    setActiveProvider("Spotify");
+    if (soundCloudStatus === "connected") {
+      loadSoundCloudTaste();
+      return;
+    }
+
+    setActiveProvider(soundCloudStatus ? "SoundCloud" : "Spotify");
     setScanStatus("idle");
-    setMusicError("Spotify connection failed. Try again or use the manual filters.");
-  }, [loadSpotifyTaste]);
+    setMusicError(`${soundCloudStatus ? "SoundCloud" : "Spotify"} connection failed. Try again or use the manual filters.`);
+  }, [loadSoundCloudTaste, loadSpotifyTaste]);
 
   function toggleMusic(style: MusicStyle) {
     captureEvent("Preference Changed", {
@@ -172,29 +301,25 @@ export function HomeClient({ initialVenues }: HomeClientProps) {
       return;
     }
 
-    const taste = musicTasteProfiles[provider];
-    captureEvent("Music Scan Started", {
-      provider,
-      mode: "preview"
-    });
-    setActiveProvider(provider);
-    setMusicTaste(null);
-    setScanStatus("scanning");
-
-    window.setTimeout(() => {
-      setMusicTaste(taste);
-      setScanStatus("complete");
-      captureEvent("Music Scan Completed", {
+    if (provider === "Apple Music") {
+      captureEvent("Music Scan Started", {
         provider,
-        confidence: taste.confidence,
-        topGenres: taste.topGenres.join(", ")
+        mode: "musickit"
       });
-      setProfile((current) => ({
-        ...current,
-        music: taste.topGenres,
-        vibe: taste.energy
-      }));
-    }, 900);
+      loadAppleMusicTaste();
+      return;
+    }
+
+    if (provider === "SoundCloud") {
+      captureEvent("Music Scan Started", {
+        provider,
+        mode: "oauth"
+      });
+      setActiveProvider(provider);
+      setScanStatus("scanning");
+      window.location.href = "/api/soundcloud/login";
+      return;
+    }
   }
 
   return (
@@ -248,10 +373,18 @@ export function HomeClient({ initialVenues }: HomeClientProps) {
                       {activeProvider === provider && scanStatus === "scanning"
                         ? provider === "Spotify"
                           ? "Connecting Spotify..."
-                          : "Analyzing taste..."
+                          : provider === "Apple Music"
+                            ? "Opening Apple Music..."
+                            : provider === "SoundCloud"
+                              ? "Connecting SoundCloud..."
+                              : "Analyzing taste..."
                         : provider === "Spotify"
                           ? "Connect for real matching"
-                          : "Preview music-based matching"}
+                          : provider === "Apple Music"
+                            ? "Authorize recent plays"
+                            : provider === "SoundCloud"
+                              ? "Connect liked tracks"
+                              : "Preview music-based matching"}
                     </span>
                     <span className={`mt-3 flex flex-wrap gap-1.5 ${musicTaste?.provider === provider || activeProvider === provider ? "text-night/70" : "text-white/54"}`}>
                       {musicTasteProfiles[provider].topGenres.map((genre) => (
@@ -588,4 +721,36 @@ function PreferenceBlock({ title, children }: { title: string; children: ReactNo
       <div className="flex flex-wrap gap-2">{children}</div>
     </div>
   );
+}
+
+function loadAppleMusicScript() {
+  if (window.MusicKit) {
+    return Promise.resolve();
+  }
+
+  return new Promise<void>((resolve, reject) => {
+    const existingScript = document.querySelector<HTMLScriptElement>("script[data-nitefy-apple-music]");
+
+    if (existingScript) {
+      existingScript.addEventListener("load", () => resolve(), {
+        once: true
+      });
+      existingScript.addEventListener("error", () => reject(new Error("Apple Music could not be loaded.")), {
+        once: true
+      });
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.async = true;
+    script.dataset.nitefyAppleMusic = "true";
+    script.src = "https://js-cdn.music.apple.com/musickit/v3/musickit.js";
+    script.addEventListener("load", () => resolve(), {
+      once: true
+    });
+    script.addEventListener("error", () => reject(new Error("Apple Music could not be loaded.")), {
+      once: true
+    });
+    document.head.appendChild(script);
+  });
 }
