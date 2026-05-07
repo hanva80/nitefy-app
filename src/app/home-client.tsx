@@ -13,7 +13,6 @@ import {
 } from "lucide-react";
 import { OptionPill } from "@/components/option-pill";
 import { VenueCard } from "@/components/venue-card";
-import { musicTasteProfiles } from "@/data/music-taste-profiles";
 import {
   budgetOptions,
   contextOptions,
@@ -41,25 +40,11 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 const cityOptions = ["Düsseldorf", "Köln", "Essen"];
 const panelClass = "rounded-lg border border-white/10 bg-[#11141d]/88 p-4 shadow-[0_18px_60px_rgba(0,0,0,0.28)] backdrop-blur";
+const spotifyPreviewGenres: MusicStyle[] = ["Hip-hop", "Afrobeats", "R&B"];
 
 type HomeClientProps = {
   initialVenues: Venue[];
 };
-
-type MusicKitInstance = {
-  authorize: () => Promise<string>;
-};
-
-type MusicKitNamespace = {
-  configure: (options: { app: { build: string; name: string }; developerToken: string }) => MusicKitInstance;
-  getInstance: () => MusicKitInstance;
-};
-
-declare global {
-  interface Window {
-    MusicKit?: MusicKitNamespace;
-  }
-}
 
 export function HomeClient({ initialVenues }: HomeClientProps) {
   const [profile, setProfile] = useState<PreferenceProfile>(defaultProfile);
@@ -110,120 +95,11 @@ export function HomeClient({ initialVenues }: HomeClientProps) {
     }
   }, []);
 
-  const loadAppleMusicTaste = useCallback(async () => {
-    setActiveProvider("Apple Music");
-    setMusicTaste(null);
-    setMusicError(null);
-    setScanStatus("scanning");
-
-    try {
-      const tokenResponse = await fetch("/api/apple-music/developer-token");
-
-      if (!tokenResponse.ok) {
-        const errorPayload = (await tokenResponse.json().catch(() => null)) as { hint?: string } | null;
-        throw new Error(errorPayload?.hint ?? "Apple Music is not configured yet.");
-      }
-
-      const { developerToken } = (await tokenResponse.json()) as {
-        developerToken: string;
-      };
-
-      await loadAppleMusicScript();
-
-      const music = window.MusicKit?.configure({
-        app: {
-          build: "0.1.0",
-          name: "NITEFY"
-        },
-        developerToken
-      });
-
-      if (!music) {
-        throw new Error("Apple Music could not be started in this browser.");
-      }
-
-      const musicUserToken = await music.authorize();
-      const tasteResponse = await fetch("/api/apple-music/taste", {
-        body: JSON.stringify({
-          musicUserToken
-        }),
-        headers: {
-          "Content-Type": "application/json"
-        },
-        method: "POST"
-      });
-
-      if (!tasteResponse.ok) {
-        const errorPayload = (await tasteResponse.json().catch(() => null)) as { hint?: string } | null;
-        throw new Error(errorPayload?.hint ?? "Apple Music connected, but your taste profile could not be loaded.");
-      }
-
-      const data = (await tasteResponse.json()) as {
-        profile: MusicTasteProfile;
-      };
-
-      setMusicTaste(data.profile);
-      setScanStatus("complete");
-      captureEvent("Music Scan Completed", {
-        provider: "Apple Music",
-        confidence: data.profile.confidence,
-        topGenres: data.profile.topGenres.join(", ")
-      });
-      setProfile((current) => ({
-        ...current,
-        music: data.profile.topGenres,
-        vibe: data.profile.energy
-      }));
-    } catch (error) {
-      setScanStatus("idle");
-      const errorMessage = error instanceof Error ? error.message : "Apple Music connected, but your taste profile could not be loaded.";
-      setMusicError(errorMessage);
-    }
-  }, []);
-
-  const loadSoundCloudTaste = useCallback(async () => {
-    setActiveProvider("SoundCloud");
-    setMusicTaste(null);
-    setMusicError(null);
-    setScanStatus("scanning");
-
-    try {
-      const response = await fetch("/api/soundcloud/taste");
-
-      if (!response.ok) {
-        const errorPayload = (await response.json().catch(() => null)) as { hint?: string } | null;
-        throw new Error(errorPayload?.hint ?? "SoundCloud connected, but your taste profile could not be loaded.");
-      }
-
-      const data = (await response.json()) as {
-        profile: MusicTasteProfile;
-      };
-
-      setMusicTaste(data.profile);
-      setScanStatus("complete");
-      captureEvent("Music Scan Completed", {
-        provider: "SoundCloud",
-        confidence: data.profile.confidence,
-        topGenres: data.profile.topGenres.join(", ")
-      });
-      setProfile((current) => ({
-        ...current,
-        music: data.profile.topGenres,
-        vibe: data.profile.energy
-      }));
-    } catch (error) {
-      setScanStatus("idle");
-      const errorMessage = error instanceof Error ? error.message : "SoundCloud connected, but your taste profile could not be loaded.";
-      setMusicError(errorMessage);
-    }
-  }, []);
-
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const spotifyStatus = params.get("spotify");
-    const soundCloudStatus = params.get("soundcloud");
 
-    if (!spotifyStatus && !soundCloudStatus) {
+    if (!spotifyStatus) {
       return;
     }
 
@@ -234,15 +110,10 @@ export function HomeClient({ initialVenues }: HomeClientProps) {
       return;
     }
 
-    if (soundCloudStatus === "connected") {
-      loadSoundCloudTaste();
-      return;
-    }
-
-    setActiveProvider(soundCloudStatus ? "SoundCloud" : "Spotify");
+    setActiveProvider("Spotify");
     setScanStatus("idle");
-    setMusicError(`${soundCloudStatus ? "SoundCloud" : "Spotify"} connection failed. Try again or use the manual filters.`);
-  }, [loadSoundCloudTaste, loadSpotifyTaste]);
+    setMusicError("Spotify connection failed. Try again or use the manual filters.");
+  }, [loadSpotifyTaste]);
 
   function toggleMusic(style: MusicStyle) {
     captureEvent("Preference Changed", {
@@ -287,39 +158,15 @@ export function HomeClient({ initialVenues }: HomeClientProps) {
     );
   }
 
-  function analyzeMusicTaste(provider: MusicProvider) {
+  function analyzeSpotifyTaste() {
     setMusicError(null);
-
-    if (provider === "Spotify") {
-      captureEvent("Music Scan Started", {
-        provider,
-        mode: "oauth"
-      });
-      setActiveProvider(provider);
-      setScanStatus("scanning");
-      window.location.href = "/api/spotify/login";
-      return;
-    }
-
-    if (provider === "Apple Music") {
-      captureEvent("Music Scan Started", {
-        provider,
-        mode: "musickit"
-      });
-      loadAppleMusicTaste();
-      return;
-    }
-
-    if (provider === "SoundCloud") {
-      captureEvent("Music Scan Started", {
-        provider,
-        mode: "oauth"
-      });
-      setActiveProvider(provider);
-      setScanStatus("scanning");
-      window.location.href = "/api/soundcloud/login";
-      return;
-    }
+    captureEvent("Music Scan Started", {
+      provider: "Spotify",
+      mode: "oauth"
+    });
+    setActiveProvider("Spotify");
+    setScanStatus("scanning");
+    window.location.href = "/api/spotify/login";
   }
 
   return (
@@ -349,52 +196,35 @@ export function HomeClient({ initialVenues }: HomeClientProps) {
               <StepLabel number="1" label="Music taste" icon={<Headphones size={17} />} />
               <h1 className="mt-3 text-4xl font-black leading-[0.98] text-white">Tonight starts with your sound.</h1>
               <p className="mt-3 text-sm leading-6 text-white/68">
-                Pick a provider preview and NITEFY builds a nightlife profile from your music taste.
+                Connect Spotify and NITEFY builds your nightlife profile from your recent music taste.
               </p>
 
               <div className="mt-5 grid gap-2">
-                {(["Spotify", "Apple Music", "SoundCloud"] as MusicProvider[]).map((provider) => (
-                  <button
-                    key={provider}
-                    type="button"
-                    onClick={() => analyzeMusicTaste(provider)}
-                    disabled={scanStatus === "scanning"}
-                    className={`rounded-lg border p-4 text-left transition ${
-                      musicTaste?.provider === provider || activeProvider === provider
-                        ? "border-lime bg-lime text-night shadow-glow"
-                        : "border-white/12 bg-black/24 text-white hover:border-lime/60 hover:bg-white/[0.08]"
-                    } ${scanStatus === "scanning" ? "cursor-wait opacity-90" : ""}`}
-                  >
-                    <span className="flex items-center justify-between gap-3">
-                      <span className="text-base font-black">{provider}</span>
-                      <Music2 size={18} />
-                    </span>
-                    <span className={`mt-1 block text-sm ${musicTaste?.provider === provider || activeProvider === provider ? "text-night/70" : "text-white/58"}`}>
-                      {activeProvider === provider && scanStatus === "scanning"
-                        ? provider === "Spotify"
-                          ? "Connecting Spotify..."
-                          : provider === "Apple Music"
-                            ? "Opening Apple Music..."
-                            : provider === "SoundCloud"
-                              ? "Connecting SoundCloud..."
-                              : "Analyzing taste..."
-                        : provider === "Spotify"
-                          ? "Connect for real matching"
-                          : provider === "Apple Music"
-                            ? "Authorize recent plays"
-                            : provider === "SoundCloud"
-                              ? "Connect liked tracks"
-                              : "Preview music-based matching"}
-                    </span>
-                    <span className={`mt-3 flex flex-wrap gap-1.5 ${musicTaste?.provider === provider || activeProvider === provider ? "text-night/70" : "text-white/54"}`}>
-                      {musicTasteProfiles[provider].topGenres.map((genre) => (
-                        <span key={genre} className="rounded-full border border-current/20 px-2 py-0.5 text-[11px] font-black">
-                          {genre}
-                        </span>
-                      ))}
-                    </span>
-                  </button>
-                ))}
+                <button
+                  type="button"
+                  onClick={analyzeSpotifyTaste}
+                  disabled={scanStatus === "scanning"}
+                  className={`rounded-lg border p-4 text-left transition ${
+                    musicTaste?.provider === "Spotify" || activeProvider === "Spotify"
+                      ? "border-lime bg-lime text-night shadow-glow"
+                      : "border-white/12 bg-black/24 text-white hover:border-lime/60 hover:bg-white/[0.08]"
+                  } ${scanStatus === "scanning" ? "cursor-wait opacity-90" : ""}`}
+                >
+                  <span className="flex items-center justify-between gap-3">
+                    <span className="text-base font-black">Spotify</span>
+                    <Music2 size={18} />
+                  </span>
+                  <span className={`mt-1 block text-sm ${musicTaste?.provider === "Spotify" || activeProvider === "Spotify" ? "text-night/70" : "text-white/58"}`}>
+                    {activeProvider === "Spotify" && scanStatus === "scanning" ? "Connecting Spotify..." : "Connect for real matching"}
+                  </span>
+                  <span className={`mt-3 flex flex-wrap gap-1.5 ${musicTaste?.provider === "Spotify" || activeProvider === "Spotify" ? "text-night/70" : "text-white/54"}`}>
+                    {spotifyPreviewGenres.map((genre) => (
+                      <span key={genre} className="rounded-full border border-current/20 px-2 py-0.5 text-[11px] font-black">
+                        {genre}
+                      </span>
+                    ))}
+                  </span>
+                </button>
               </div>
 
               {musicError ? (
@@ -407,7 +237,7 @@ export function HomeClient({ initialVenues }: HomeClientProps) {
                 <div className="mt-5 border-t border-white/10 pt-4">
                   <div className="mb-3 flex items-center gap-2 text-sm font-black text-lime">
                     <Radio size={16} />
-                    Scanning {activeProvider}
+                    Scanning Spotify
                   </div>
                   <ScanStep label="Reading recent genres" active />
                   <ScanStep label="Detecting nightlife energy" active />
@@ -631,12 +461,12 @@ export function HomeClient({ initialVenues }: HomeClientProps) {
                 <div>
                   <p className="text-xs font-black uppercase text-lime">Your night profile</p>
                   <h2 className="mt-2 text-3xl font-black leading-tight text-white sm:text-4xl">
-                    {musicTaste ? `${musicTaste.provider} taste, ${profile.vibe.toLowerCase()} vibe` : "Choose a music scan to start"}
+                    {musicTaste ? `${musicTaste.provider} taste, ${profile.vibe.toLowerCase()} vibe` : "Connect Spotify to start"}
                   </h2>
                   <p className="mt-2 max-w-2xl text-sm leading-6 text-white/64">
                     {musicTaste
                       ? musicTaste.nightlifeTranslation
-                      : "You can still use the manual filters, but the clearest NITEFY experience starts with music taste."}
+                      : "You can still use the manual filters, but the clearest NITEFY experience starts with Spotify taste."}
                   </p>
                 </div>
                 <div className="grid min-w-[150px] grid-cols-2 overflow-hidden rounded-lg border border-white/10 bg-white/[0.05] text-center">
@@ -721,36 +551,4 @@ function PreferenceBlock({ title, children }: { title: string; children: ReactNo
       <div className="flex flex-wrap gap-2">{children}</div>
     </div>
   );
-}
-
-function loadAppleMusicScript() {
-  if (window.MusicKit) {
-    return Promise.resolve();
-  }
-
-  return new Promise<void>((resolve, reject) => {
-    const existingScript = document.querySelector<HTMLScriptElement>("script[data-nitefy-apple-music]");
-
-    if (existingScript) {
-      existingScript.addEventListener("load", () => resolve(), {
-        once: true
-      });
-      existingScript.addEventListener("error", () => reject(new Error("Apple Music could not be loaded.")), {
-        once: true
-      });
-      return;
-    }
-
-    const script = document.createElement("script");
-    script.async = true;
-    script.dataset.nitefyAppleMusic = "true";
-    script.src = "https://js-cdn.music.apple.com/musickit/v3/musickit.js";
-    script.addEventListener("load", () => resolve(), {
-      once: true
-    });
-    script.addEventListener("error", () => reject(new Error("Apple Music could not be loaded.")), {
-      once: true
-    });
-    document.head.appendChild(script);
-  });
 }
