@@ -14,10 +14,13 @@ export default function RootLayout({
 }: Readonly<{
   children: ReactNode;
 }>) {
+  const posthogKey =
+    process.env.NEXT_PUBLIC_POSTHOG_PROJECT_KEY ?? process.env.NEXT_PUBLIC_POSTHOG_KEY;
+
   return (
     <html lang="en">
       <body>
-        <PHProvider>
+        <PHProvider posthogKey={posthogKey}>
           {children}
         </PHProvider>
         <Analytics />
