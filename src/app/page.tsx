@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  ChevronDown,
   Headphones,
   LocateFixed,
   MapPin,
@@ -8,7 +9,7 @@ import {
   Navigation,
   Radio,
   SlidersHorizontal,
-  Sparkles
+  Star
 } from "lucide-react";
 import { OptionPill } from "@/components/option-pill";
 import { VenueCard } from "@/components/venue-card";
@@ -38,6 +39,7 @@ import type { ReactNode } from "react";
 import { useMemo, useState } from "react";
 
 const cityOptions = ["Düsseldorf", "Köln", "Essen"];
+const panelClass = "rounded-lg border border-white/10 bg-[#11141d]/88 p-4 shadow-[0_18px_60px_rgba(0,0,0,0.28)] backdrop-blur";
 
 export default function Home() {
   const [profile, setProfile] = useState<PreferenceProfile>(defaultProfile);
@@ -105,7 +107,7 @@ export default function Home() {
   return (
     <main className="min-h-screen px-4 py-4 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
-        <header className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-4">
+        <header className="sticky top-0 z-20 -mx-4 flex flex-wrap items-center justify-between gap-3 border-b border-white/10 bg-night/88 px-4 py-4 backdrop-blur sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
           <div>
             <div className="text-2xl font-black tracking-normal text-white">NITEFY</div>
             <p className="mt-1 text-sm font-semibold text-white/58">Don&apos;t guess the night. NITEFY it.</p>
@@ -117,19 +119,22 @@ export default function Home() {
               {city}
             </span>
             <span className="rounded-full bg-lime px-3 py-2 text-xs font-black text-night">MVP</span>
+            <a href="#recommendations" className="rounded-full bg-white px-4 py-2 text-xs font-black text-night transition hover:bg-lime lg:hidden">
+              See matches
+            </a>
           </div>
         </header>
 
-        <section className="grid gap-5 py-6 lg:grid-cols-[380px_minmax(0,1fr)]">
-          <aside className="space-y-4 lg:sticky lg:top-4 lg:self-start">
-            <section className="rounded-lg border border-white/10 bg-white/[0.07] p-4">
+        <section className="grid gap-5 py-5 lg:grid-cols-[390px_minmax(0,1fr)]">
+          <aside className="space-y-4 lg:sticky lg:top-24 lg:self-start">
+            <section className={panelClass}>
               <StepLabel number="1" label="Music taste" icon={<Headphones size={17} />} />
-              <h1 className="mt-3 text-3xl font-black leading-tight text-white">Start with your music.</h1>
+              <h1 className="mt-3 text-4xl font-black leading-[0.98] text-white">Tonight starts with your sound.</h1>
               <p className="mt-3 text-sm leading-6 text-white/68">
-                Simulate a secure music scan. NITEFY reads your recent sound and translates it into nightlife matches.
+                Pick a provider preview and NITEFY builds a nightlife profile from your music taste.
               </p>
 
-              <div className="mt-4 grid gap-2">
+              <div className="mt-5 grid gap-2">
                 {(["Spotify", "Apple Music"] as MusicProvider[]).map((provider) => (
                   <button
                     key={provider}
@@ -138,8 +143,8 @@ export default function Home() {
                     disabled={scanStatus === "scanning"}
                     className={`rounded-lg border p-4 text-left transition ${
                       musicTaste?.provider === provider || activeProvider === provider
-                        ? "border-lime bg-lime text-night"
-                        : "border-white/12 bg-night/55 text-white hover:border-lime/60"
+                        ? "border-lime bg-lime text-night shadow-glow"
+                        : "border-white/12 bg-black/24 text-white hover:border-lime/60 hover:bg-white/[0.08]"
                     } ${scanStatus === "scanning" ? "cursor-wait opacity-90" : ""}`}
                   >
                     <span className="flex items-center justify-between gap-3">
@@ -149,12 +154,19 @@ export default function Home() {
                     <span className={`mt-1 block text-sm ${musicTaste?.provider === provider || activeProvider === provider ? "text-night/70" : "text-white/58"}`}>
                       {activeProvider === provider && scanStatus === "scanning" ? "Analyzing taste..." : "Preview music-based matching"}
                     </span>
+                    <span className={`mt-3 flex flex-wrap gap-1.5 ${musicTaste?.provider === provider || activeProvider === provider ? "text-night/70" : "text-white/54"}`}>
+                      {musicTasteProfiles[provider].topGenres.map((genre) => (
+                        <span key={genre} className="rounded-full border border-current/20 px-2 py-0.5 text-[11px] font-black">
+                          {genre}
+                        </span>
+                      ))}
+                    </span>
                   </button>
                 ))}
               </div>
 
               {scanStatus === "scanning" ? (
-                <div className="mt-4 rounded-lg border border-lime/30 bg-lime/10 p-4">
+                <div className="mt-5 border-t border-white/10 pt-4">
                   <div className="mb-3 flex items-center gap-2 text-sm font-black text-lime">
                     <Radio size={16} />
                     Scanning {activeProvider}
@@ -166,13 +178,13 @@ export default function Home() {
               ) : null}
 
               {musicTaste ? (
-                <div className="mt-4 border-t border-white/10 pt-4">
+                <div className="mt-5 border-t border-white/10 pt-4">
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <p className="text-sm font-black text-white">{musicTaste.provider} taste profile</p>
                       <p className="mt-1 text-xs font-bold text-white/48">{musicTaste.listeningWindow}</p>
                     </div>
-                    <div className="rounded-lg bg-lime px-3 py-2 text-right text-night">
+                    <div className="rounded-lg bg-lime px-3 py-2 text-right text-night shadow-glow">
                       <p className="text-[10px] font-black uppercase">Confidence</p>
                       <p className="text-lg font-black">{musicTaste.confidence}%</p>
                     </div>
@@ -203,7 +215,7 @@ export default function Home() {
               ) : null}
             </section>
 
-            <section className="rounded-lg border border-white/10 bg-white/[0.07] p-4">
+            <section className={panelClass}>
               <StepLabel number="2" label="Tonight" icon={<SlidersHorizontal size={17} />} />
 
               <PreferenceBlock title="Music">
@@ -254,8 +266,9 @@ export default function Home() {
               </div>
 
               <details className="group border-t border-white/10 pt-4">
-                <summary className="cursor-pointer list-none text-sm font-black text-cyan">
-                  More filters
+                <summary className="flex cursor-pointer list-none items-center justify-between text-sm font-black text-cyan">
+                  Advanced filters
+                  <ChevronDown size={16} className="transition group-open:rotate-180" />
                 </summary>
 
                 <div className="mt-4">
@@ -295,7 +308,7 @@ export default function Home() {
               </details>
             </section>
 
-            <section className="rounded-lg border border-white/10 bg-white/[0.07] p-4">
+            <section className={panelClass}>
               <StepLabel number="3" label="Location" icon={<LocateFixed size={17} />} />
               <div className="mt-3 flex flex-wrap gap-2">
                 {cityOptions.map((option) => (
@@ -327,12 +340,12 @@ export default function Home() {
             </section>
           </aside>
 
-          <section className="min-w-0">
-            <div className="mb-4 rounded-lg border border-white/10 bg-black/22 p-4 sm:p-5">
+          <section id="recommendations" className="min-w-0 scroll-mt-24">
+            <div className="mb-4 rounded-lg border border-white/10 bg-[#0d1018]/88 p-4 shadow-[0_18px_60px_rgba(0,0,0,0.24)] backdrop-blur sm:p-5">
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
                   <p className="text-xs font-black uppercase text-lime">Your night profile</p>
-                  <h2 className="mt-2 text-3xl font-black leading-tight text-white">
+                  <h2 className="mt-2 text-3xl font-black leading-tight text-white sm:text-4xl">
                     {musicTaste ? `${musicTaste.provider} taste, ${profile.vibe.toLowerCase()} vibe` : "Choose a music scan to start"}
                   </h2>
                   <p className="mt-2 max-w-2xl text-sm leading-6 text-white/64">
@@ -341,9 +354,18 @@ export default function Home() {
                       : "You can still use the manual filters, but the clearest NITEFY experience starts with music taste."}
                   </p>
                 </div>
-                <div className="rounded-lg border border-lime/30 bg-lime/10 px-4 py-3 text-right">
-                  <p className="text-xs font-bold uppercase text-lime">Best match</p>
-                  <p className="mt-1 text-2xl font-black text-white">{bestMatch?.matchScore ?? 0}%</p>
+                <div className="grid min-w-[150px] grid-cols-2 overflow-hidden rounded-lg border border-white/10 bg-white/[0.05] text-center">
+                  <div className="border-r border-white/10 px-3 py-3">
+                    <p className="text-[10px] font-black uppercase text-lime">Best</p>
+                    <p className="mt-1 text-2xl font-black text-white">{bestMatch?.matchScore ?? 0}%</p>
+                  </div>
+                  <div className="px-3 py-3">
+                    <p className="text-[10px] font-black uppercase text-cyan">Rating</p>
+                    <p className="mt-1 flex items-center justify-center gap-1 text-2xl font-black text-white">
+                      <Star size={16} className="fill-lime text-lime" />
+                      {bestMatch?.rating.toFixed(1) ?? "-"}
+                    </p>
+                  </div>
                 </div>
               </div>
 

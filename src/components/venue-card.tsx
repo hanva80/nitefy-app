@@ -1,4 +1,4 @@
-import { Clock, MapPin, Shirt, Star, Ticket } from "lucide-react";
+import { ArrowRight, Clock, MapPin, Shirt, Star, Ticket } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import type { VenueMatch } from "@/lib/types";
@@ -10,7 +10,7 @@ type VenueCardProps = {
 
 export function VenueCard({ venue, featured = false }: VenueCardProps) {
   return (
-    <article className={`overflow-hidden rounded-lg border border-white/12 bg-white/[0.06] ${featured ? "xl:col-span-2" : ""}`}>
+    <article className={`overflow-hidden rounded-lg border border-white/12 bg-[#11141d]/86 shadow-[0_18px_60px_rgba(0,0,0,0.22)] ${featured ? "xl:col-span-2" : ""}`}>
       <div className={`relative ${featured ? "min-h-[320px]" : "min-h-[240px]"}`}>
         <Image
           src={venue.image}
@@ -19,8 +19,8 @@ export function VenueCard({ venue, featured = false }: VenueCardProps) {
           sizes={featured ? "(min-width: 1024px) 66vw, 100vw" : "(min-width: 1024px) 33vw, 100vw"}
           className="object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-night via-night/25 to-transparent" />
-        <div className="absolute left-4 top-4 rounded-full bg-lime px-3 py-1 text-xs font-black text-night">{venue.matchScore}% match</div>
+        <div className="absolute inset-0 bg-gradient-to-t from-night via-night/30 to-black/10" />
+        <div className="absolute left-4 top-4 rounded-full bg-lime px-3 py-1 text-xs font-black text-night shadow-glow">{venue.matchScore}% match</div>
         <div className="absolute bottom-0 left-0 right-0 p-4">
           <div className="flex flex-wrap items-center gap-2 text-xs font-semibold uppercase text-white/75">
             <span>{venue.type}</span>
@@ -34,19 +34,19 @@ export function VenueCard({ venue, featured = false }: VenueCardProps) {
 
       <div className="space-y-4 p-4">
         <div className="grid grid-cols-2 gap-3 text-sm text-white/82 sm:grid-cols-4">
-          <span className="flex items-center gap-2 rounded-lg bg-black/18 px-3 py-2">
+          <span className="flex items-center gap-2 rounded-lg bg-black/24 px-3 py-2">
             <MapPin size={16} className="text-cyan" />
             {venue.distanceKm.toFixed(1)} km
           </span>
-          <span className="flex items-center gap-2 rounded-lg bg-black/18 px-3 py-2">
+          <span className="flex items-center gap-2 rounded-lg bg-black/24 px-3 py-2">
             <Ticket size={16} className="text-cyan" />
             {venue.priceLabel}
           </span>
-          <span className="flex items-center gap-2 rounded-lg bg-black/18 px-3 py-2">
+          <span className="flex items-center gap-2 rounded-lg bg-black/24 px-3 py-2">
             <Shirt size={16} className="text-cyan" />
             {venue.dressCode}
           </span>
-          <span className="flex items-center gap-2 rounded-lg bg-black/18 px-3 py-2">
+          <span className="flex items-center gap-2 rounded-lg bg-black/24 px-3 py-2">
             <Star size={16} className="fill-lime text-lime" />
             {venue.rating.toFixed(1)}
           </span>
@@ -79,9 +79,10 @@ export function VenueCard({ venue, featured = false }: VenueCardProps) {
 
         <Link
           href={`/venue/${venue.id}`}
-          className="block rounded-lg bg-white px-4 py-3 text-center text-sm font-black text-night transition hover:bg-lime"
+          className="flex items-center justify-center gap-2 rounded-lg bg-white px-4 py-3 text-center text-sm font-black text-night transition hover:bg-lime"
         >
           View venue
+          <ArrowRight size={16} />
         </Link>
       </div>
     </article>

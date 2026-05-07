@@ -14,8 +14,10 @@ body {
   margin: 0;
   min-height: 100vh;
   background:
-    radial-gradient(circle at top left, rgba(86, 214, 255, 0.16), transparent 28rem),
-    linear-gradient(135deg, #090a12 0%, #15111c 42%, #0c1018 100%);
+    linear-gradient(180deg, rgba(200, 255, 61, 0.05), transparent 18rem),
+    radial-gradient(circle at 14% 8%, rgba(86, 214, 255, 0.18), transparent 24rem),
+    radial-gradient(circle at 100% 18%, rgba(255, 92, 92, 0.12), transparent 22rem),
+    linear-gradient(135deg, #090a12 0%, #11131d 48%, #0b1016 100%);
   color: #f8fafc;
   font-family: Arial, Helvetica, sans-serif;
 }
@@ -24,6 +26,14 @@ button,
 input,
 select {
   font: inherit;
+}
+
+button:focus-visible,
+a:focus-visible,
+summary:focus-visible,
+input:focus-visible {
+  outline: 2px solid #c8ff3d;
+  outline-offset: 3px;
 }
 
 .scrollbar-hidden {

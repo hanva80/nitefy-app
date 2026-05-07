@@ -33,7 +33,7 @@ export const venues: Venue[] = [
     dressCode: "Casual",
     openingHours: "Fri-Sat, 23:00-06:00",
     rating: 4.4,
-    image: "https://images.unsplash.com/photo-1571266028243-d220c9c3b888?auto=format&fit=crop&w=1200&q=80",
+    image: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1200&q=80",
     visualCue: "Dark room, heavy sound, minimal dress code",
     description: "A raw electronic spot for people who care more about sound and energy than posing."
   },
