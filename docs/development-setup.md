@@ -29,7 +29,7 @@ Open `http://localhost:3000`.
 Create `.env.local` for local PostHog testing:
 
 ```bash
-NEXT_PUBLIC_POSTHOG_KEY=your_project_key
+NEXT_PUBLIC_POSTHOG_PROJECT_KEY=your_project_key
 ```
 
 The app proxies PostHog requests through `/ingest` to the EU PostHog endpoint.

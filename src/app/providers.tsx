@@ -5,7 +5,8 @@ import { PostHogProvider } from "posthog-js/react";
 import type { ReactNode } from "react";
 
 if (typeof window !== "undefined") {
-  const posthogKey = process.env.NEXT_PUBLIC_POSTHOG_KEY;
+  const posthogKey =
+    process.env.NEXT_PUBLIC_POSTHOG_PROJECT_KEY ?? process.env.NEXT_PUBLIC_POSTHOG_KEY;
 
   if (posthogKey && !posthog.__loaded) {
     posthog.init(posthogKey, {
