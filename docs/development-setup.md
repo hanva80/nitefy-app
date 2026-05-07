@@ -21,7 +21,18 @@ Open `http://localhost:3000`.
 - Recommendation logic is local and transparent in `src/lib/recommendation-engine.ts`.
 - Location uses browser geolocation when available, with manual city fallback.
 - Vercel Analytics tracks page views and core MVP events.
+- PostHog tracks the same core events, funnels, and session behavior when `NEXT_PUBLIC_POSTHOG_KEY` is configured.
 - Supabase is intentionally not included yet.
+
+## Environment Variables
+
+Create `.env.local` for local PostHog testing:
+
+```bash
+NEXT_PUBLIC_POSTHOG_KEY=your_project_key
+```
+
+The app proxies PostHog requests through `/ingest` to the EU PostHog endpoint.
 
 ## First Manual Test
 
@@ -38,6 +49,7 @@ The MVP tracks:
 - `Music Scan Started`
 - `Music Scan Completed`
 - `Preference Changed`
+- `Advanced Filters Opened`
 - `Location Requested`
 - `Location City Selected`
 - `Venue Opened`

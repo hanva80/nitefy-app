@@ -1,6 +1,5 @@
 "use client";
 
-import { track } from "@vercel/analytics/react";
 import {
   ChevronDown,
   Headphones,
@@ -24,6 +23,7 @@ import {
   vibeOptions
 } from "@/data/preference-options";
 import { venues } from "@/data/venues";
+import { captureEvent } from "@/lib/analytics";
 import { defaultProfile, getRecommendedVenues } from "@/lib/recommendation-engine";
 import type {
   Budget,
@@ -54,7 +54,7 @@ export default function Home() {
   const bestMatch = recommendations[0];
 
   function toggleMusic(style: MusicStyle) {
-    track("Preference Changed", {
+    captureEvent("Preference Changed", {
       field: "music",
       value: style
     });
@@ -67,7 +67,7 @@ export default function Home() {
   }
 
   function requestLocation() {
-    track("Location Requested", {
+    captureEvent("Location Requested", {
       city
     });
 
@@ -98,7 +98,7 @@ export default function Home() {
 
   function analyzeMusicTaste(provider: MusicProvider) {
     const taste = musicTasteProfiles[provider];
-    track("Music Scan Started", {
+    captureEvent("Music Scan Started", {
       provider
     });
     setActiveProvider(provider);
@@ -108,7 +108,7 @@ export default function Home() {
     window.setTimeout(() => {
       setMusicTaste(taste);
       setScanStatus("complete");
-      track("Music Scan Completed", {
+      captureEvent("Music Scan Completed", {
         provider,
         confidence: taste.confidence,
         topGenres: taste.topGenres.join(", ")
@@ -248,7 +248,7 @@ export default function Home() {
                     label={vibe}
                     active={profile.vibe === vibe}
                     onClick={(value: Vibe) => {
-                      track("Preference Changed", {
+                      captureEvent("Preference Changed", {
                         field: "vibe",
                         value
                       });
@@ -265,7 +265,7 @@ export default function Home() {
                     label={budget}
                     active={profile.budget === budget}
                     onClick={(value: Budget) => {
-                      track("Preference Changed", {
+                      captureEvent("Preference Changed", {
                         field: "budget",
                         value
                       });
@@ -290,7 +290,7 @@ export default function Home() {
                   value={profile.distanceKm}
                   onChange={(event) => {
                     const distanceKm = Number(event.target.value);
-                    track("Preference Changed", {
+                    captureEvent("Preference Changed", {
                       field: "distance",
                       value: distanceKm
                     });
@@ -301,7 +301,14 @@ export default function Home() {
                 />
               </div>
 
-              <details className="group border-t border-white/10 pt-4">
+              <details
+                className="group border-t border-white/10 pt-4"
+                onToggle={(event) => {
+                  if (event.currentTarget.open) {
+                    captureEvent("Advanced Filters Opened");
+                  }
+                }}
+              >
                 <summary className="flex cursor-pointer list-none items-center justify-between text-sm font-black text-cyan">
                   Advanced filters
                   <ChevronDown size={16} className="transition group-open:rotate-180" />
@@ -315,7 +322,7 @@ export default function Home() {
                         label={dressCode}
                         active={profile.dressCode === dressCode}
                         onClick={(value: DressCode) => {
-                          track("Preference Changed", {
+                          captureEvent("Preference Changed", {
                             field: "dressCode",
                             value
                           });
@@ -332,7 +339,7 @@ export default function Home() {
                         label={venueType}
                         active={profile.venueType === venueType}
                         onClick={(value: VenueType | "Any") => {
-                          track("Preference Changed", {
+                          captureEvent("Preference Changed", {
                             field: "venueType",
                             value
                           });
@@ -349,7 +356,7 @@ export default function Home() {
                         label={context}
                         active={profile.context === context}
                         onClick={(value: GroupContext) => {
-                          track("Preference Changed", {
+                          captureEvent("Preference Changed", {
                             field: "context",
                             value
                           });
@@ -370,7 +377,7 @@ export default function Home() {
                     key={option}
                     type="button"
                     onClick={() => {
-                      track("Location City Selected", {
+                      captureEvent("Location City Selected", {
                         city: option
                       });
                       setCity(option);

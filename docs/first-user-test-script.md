@@ -37,5 +37,6 @@ You are going out tonight with friends in Düsseldorf and nobody knows where to 
 
 - Which music provider users pick first
 - Whether users adjust filters after the scan
+- Whether users open advanced filters
 - Which venue cards users open
 - Whether users request location or choose city manually
