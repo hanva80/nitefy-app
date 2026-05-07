@@ -179,6 +179,12 @@ export function HomeClient({ initialVenues }: HomeClientProps) {
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
+            <a
+              href="/marketing"
+              className="hidden rounded-full border border-white/12 bg-white/[0.06] px-3 py-2 text-xs font-black text-white/78 transition hover:border-lime hover:text-lime sm:inline-flex"
+            >
+              Launch plan
+            </a>
             <span className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/[0.06] px-3 py-2 text-xs font-bold text-white/78">
               <MapPin size={14} className="text-cyan" />
               {city}
