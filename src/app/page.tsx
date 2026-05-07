@@ -1,5 +1,6 @@
 "use client";
 
+import { track } from "@vercel/analytics/react";
 import {
   ChevronDown,
   Headphones,
@@ -53,6 +54,10 @@ export default function Home() {
   const bestMatch = recommendations[0];
 
   function toggleMusic(style: MusicStyle) {
+    track("Preference Changed", {
+      field: "music",
+      value: style
+    });
     setProfile((current) => ({
       ...current,
       music: current.music.includes(style)
@@ -62,6 +67,10 @@ export default function Home() {
   }
 
   function requestLocation() {
+    track("Location Requested", {
+      city
+    });
+
     if (!("geolocation" in navigator)) {
       setLocationStatus("Location unavailable. Pick a city manually.");
       return;
@@ -89,6 +98,9 @@ export default function Home() {
 
   function analyzeMusicTaste(provider: MusicProvider) {
     const taste = musicTasteProfiles[provider];
+    track("Music Scan Started", {
+      provider
+    });
     setActiveProvider(provider);
     setMusicTaste(null);
     setScanStatus("scanning");
@@ -96,6 +108,11 @@ export default function Home() {
     window.setTimeout(() => {
       setMusicTaste(taste);
       setScanStatus("complete");
+      track("Music Scan Completed", {
+        provider,
+        confidence: taste.confidence,
+        topGenres: taste.topGenres.join(", ")
+      });
       setProfile((current) => ({
         ...current,
         music: taste.topGenres,
@@ -230,7 +247,13 @@ export default function Home() {
                     key={vibe}
                     label={vibe}
                     active={profile.vibe === vibe}
-                    onClick={(value: Vibe) => setProfile((current) => ({ ...current, vibe: value }))}
+                    onClick={(value: Vibe) => {
+                      track("Preference Changed", {
+                        field: "vibe",
+                        value
+                      });
+                      setProfile((current) => ({ ...current, vibe: value }));
+                    }}
                   />
                 ))}
               </PreferenceBlock>
@@ -241,7 +264,13 @@ export default function Home() {
                     key={budget}
                     label={budget}
                     active={profile.budget === budget}
-                    onClick={(value: Budget) => setProfile((current) => ({ ...current, budget: value }))}
+                    onClick={(value: Budget) => {
+                      track("Preference Changed", {
+                        field: "budget",
+                        value
+                      });
+                      setProfile((current) => ({ ...current, budget: value }));
+                    }}
                   />
                 ))}
               </PreferenceBlock>
@@ -259,7 +288,14 @@ export default function Home() {
                   max="15"
                   step="1"
                   value={profile.distanceKm}
-                  onChange={(event) => setProfile((current) => ({ ...current, distanceKm: Number(event.target.value) }))}
+                  onChange={(event) => {
+                    const distanceKm = Number(event.target.value);
+                    track("Preference Changed", {
+                      field: "distance",
+                      value: distanceKm
+                    });
+                    setProfile((current) => ({ ...current, distanceKm }));
+                  }}
                   className="h-2 w-full cursor-pointer accent-lime"
                   aria-label="Distance preference"
                 />
@@ -278,7 +314,13 @@ export default function Home() {
                         key={dressCode}
                         label={dressCode}
                         active={profile.dressCode === dressCode}
-                        onClick={(value: DressCode) => setProfile((current) => ({ ...current, dressCode: value }))}
+                        onClick={(value: DressCode) => {
+                          track("Preference Changed", {
+                            field: "dressCode",
+                            value
+                          });
+                          setProfile((current) => ({ ...current, dressCode: value }));
+                        }}
                       />
                     ))}
                   </PreferenceBlock>
@@ -289,7 +331,13 @@ export default function Home() {
                         key={venueType}
                         label={venueType}
                         active={profile.venueType === venueType}
-                        onClick={(value: VenueType | "Any") => setProfile((current) => ({ ...current, venueType: value }))}
+                        onClick={(value: VenueType | "Any") => {
+                          track("Preference Changed", {
+                            field: "venueType",
+                            value
+                          });
+                          setProfile((current) => ({ ...current, venueType: value }));
+                        }}
                       />
                     ))}
                   </PreferenceBlock>
@@ -300,7 +348,13 @@ export default function Home() {
                         key={context}
                         label={context}
                         active={profile.context === context}
-                        onClick={(value: GroupContext) => setProfile((current) => ({ ...current, context: value }))}
+                        onClick={(value: GroupContext) => {
+                          track("Preference Changed", {
+                            field: "context",
+                            value
+                          });
+                          setProfile((current) => ({ ...current, context: value }));
+                        }}
                       />
                     ))}
                   </PreferenceBlock>
@@ -316,6 +370,9 @@ export default function Home() {
                     key={option}
                     type="button"
                     onClick={() => {
+                      track("Location City Selected", {
+                        city: option
+                      });
                       setCity(option);
                       setLocationStatus(option === "Düsseldorf" ? "Showing Düsseldorf MVP data" : "Manual city selected. Venue data coming next.");
                     }}

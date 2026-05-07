@@ -20,6 +20,7 @@ Open `http://localhost:3000`.
 - Music taste analysis is simulated in `src/data/music-taste-profiles.ts` with provider, confidence, artist signals, genre signals and recommendation impact.
 - Recommendation logic is local and transparent in `src/lib/recommendation-engine.ts`.
 - Location uses browser geolocation when available, with manual city fallback.
+- Vercel Analytics tracks page views and core MVP events.
 - Supabase is intentionally not included yet.
 
 ## First Manual Test
@@ -29,3 +30,14 @@ Open `http://localhost:3000`.
 3. Confirm the recommendation order changes.
 4. Open a venue detail page.
 5. Confirm the page explains why the venue was recommended.
+
+## Analytics Events
+
+The MVP tracks:
+
+- `Music Scan Started`
+- `Music Scan Completed`
+- `Preference Changed`
+- `Location Requested`
+- `Location City Selected`
+- `Venue Opened`

@@ -32,3 +32,10 @@ You are going out tonight with friends in Düsseldorf and nobody knows where to 
 - Do visuals help them understand the vibe?
 - Does location feel clear enough?
 - Are the cards too detailed or too light?
+
+## What To Measure
+
+- Which music provider users pick first
+- Whether users adjust filters after the scan
+- Which venue cards users open
+- Whether users request location or choose city manually

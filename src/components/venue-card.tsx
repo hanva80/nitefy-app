@@ -1,3 +1,6 @@
+"use client";
+
+import { track } from "@vercel/analytics/react";
 import { ArrowRight, Clock, MapPin, Shirt, Star, Ticket } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -79,6 +82,14 @@ export function VenueCard({ venue, featured = false }: VenueCardProps) {
 
         <Link
           href={`/venue/${venue.id}`}
+          onClick={() =>
+            track("Venue Opened", {
+              venueId: venue.id,
+              venueName: venue.name,
+              matchScore: venue.matchScore,
+              type: venue.type
+            })
+          }
           className="flex items-center justify-center gap-2 rounded-lg bg-white px-4 py-3 text-center text-sm font-black text-night transition hover:bg-lime"
         >
           View venue
