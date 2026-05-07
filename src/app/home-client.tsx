@@ -37,7 +37,7 @@ import type {
   Vibe
 } from "@/lib/types";
 import type { ReactNode } from "react";
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 const cityOptions = ["Düsseldorf", "Köln", "Essen"];
 const panelClass = "rounded-lg border border-white/10 bg-[#11141d]/88 p-4 shadow-[0_18px_60px_rgba(0,0,0,0.28)] backdrop-blur";
@@ -54,8 +54,64 @@ export function HomeClient({ initialVenues }: HomeClientProps) {
   const [musicTaste, setMusicTaste] = useState<MusicTasteProfile | null>(null);
   const [scanStatus, setScanStatus] = useState<"idle" | "scanning" | "complete">("idle");
   const [activeProvider, setActiveProvider] = useState<MusicProvider | null>(null);
+  const [musicError, setMusicError] = useState<string | null>(null);
   const recommendations = useMemo(() => getRecommendedVenues(initialVenues, profile), [initialVenues, profile]);
   const bestMatch = recommendations[0];
+
+  const loadSpotifyTaste = useCallback(async () => {
+    setActiveProvider("Spotify");
+    setMusicTaste(null);
+    setMusicError(null);
+    setScanStatus("scanning");
+
+    try {
+      const response = await fetch("/api/spotify/taste");
+
+      if (!response.ok) {
+        throw new Error("Spotify taste unavailable");
+      }
+
+      const data = (await response.json()) as {
+        profile: MusicTasteProfile;
+      };
+
+      setMusicTaste(data.profile);
+      setScanStatus("complete");
+      captureEvent("Music Scan Completed", {
+        provider: "Spotify",
+        confidence: data.profile.confidence,
+        topGenres: data.profile.topGenres.join(", ")
+      });
+      setProfile((current) => ({
+        ...current,
+        music: data.profile.topGenres,
+        vibe: data.profile.energy
+      }));
+    } catch {
+      setScanStatus("idle");
+      setMusicError("Spotify is connected, but your taste profile could not be loaded.");
+    }
+  }, []);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const spotifyStatus = params.get("spotify");
+
+    if (!spotifyStatus) {
+      return;
+    }
+
+    window.history.replaceState({}, "", window.location.pathname);
+
+    if (spotifyStatus === "connected") {
+      loadSpotifyTaste();
+      return;
+    }
+
+    setActiveProvider("Spotify");
+    setScanStatus("idle");
+    setMusicError("Spotify connection failed. Try again or use the manual filters.");
+  }, [loadSpotifyTaste]);
 
   function toggleMusic(style: MusicStyle) {
     captureEvent("Preference Changed", {
@@ -101,9 +157,23 @@ export function HomeClient({ initialVenues }: HomeClientProps) {
   }
 
   function analyzeMusicTaste(provider: MusicProvider) {
+    setMusicError(null);
+
+    if (provider === "Spotify") {
+      captureEvent("Music Scan Started", {
+        provider,
+        mode: "oauth"
+      });
+      setActiveProvider(provider);
+      setScanStatus("scanning");
+      window.location.href = "/api/spotify/login";
+      return;
+    }
+
     const taste = musicTasteProfiles[provider];
     captureEvent("Music Scan Started", {
-      provider
+      provider,
+      mode: "preview"
     });
     setActiveProvider(provider);
     setMusicTaste(null);
@@ -173,7 +243,13 @@ export function HomeClient({ initialVenues }: HomeClientProps) {
                       <Music2 size={18} />
                     </span>
                     <span className={`mt-1 block text-sm ${musicTaste?.provider === provider || activeProvider === provider ? "text-night/70" : "text-white/58"}`}>
-                      {activeProvider === provider && scanStatus === "scanning" ? "Analyzing taste..." : "Preview music-based matching"}
+                      {activeProvider === provider && scanStatus === "scanning"
+                        ? provider === "Spotify"
+                          ? "Connecting Spotify..."
+                          : "Analyzing taste..."
+                        : provider === "Spotify"
+                          ? "Connect for real matching"
+                          : "Preview music-based matching"}
                     </span>
                     <span className={`mt-3 flex flex-wrap gap-1.5 ${musicTaste?.provider === provider || activeProvider === provider ? "text-night/70" : "text-white/54"}`}>
                       {musicTasteProfiles[provider].topGenres.map((genre) => (
@@ -185,6 +261,12 @@ export function HomeClient({ initialVenues }: HomeClientProps) {
                   </button>
                 ))}
               </div>
+
+              {musicError ? (
+                <p className="mt-4 rounded-lg border border-red-400/25 bg-red-400/10 px-3 py-2 text-sm font-bold text-red-100">
+                  {musicError}
+                </p>
+              ) : null}
 
               {scanStatus === "scanning" ? (
                 <div className="mt-5 border-t border-white/10 pt-4">

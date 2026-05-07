@@ -32,10 +32,14 @@ Create `.env.local` for local PostHog testing:
 NEXT_PUBLIC_POSTHOG_PROJECT_KEY=your_project_key
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your_supabase_publishable_key
+SPOTIFY_CLIENT_ID=your_spotify_client_id
+SPOTIFY_CLIENT_SECRET=your_spotify_client_secret
+SPOTIFY_REDIRECT_URI=http://localhost:3000/api/spotify/callback
 ```
 
 The app proxies PostHog requests through `/ingest` to the EU PostHog endpoint.
 Run `supabase/schema.sql` in the Supabase SQL Editor to create and seed the MVP tables.
+Spotify OAuth requires the exact redirect URI above to be added in the Spotify Developer Dashboard for local testing. Production should use `https://nitefy-app.vercel.app/api/spotify/callback`.
 
 ## First Manual Test
 
