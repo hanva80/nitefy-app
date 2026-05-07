@@ -2,8 +2,11 @@ import Link from "next/link";
 import { ArrowLeft, Clock, MapPin, Music, Shirt, Star, Ticket } from "lucide-react";
 import Image from "next/image";
 import type { ReactNode } from "react";
-import { venues } from "@/data/venues";
+import { venues as fallbackVenues } from "@/data/venues";
 import { defaultProfile, getRecommendedVenues } from "@/lib/recommendation-engine";
+import { createClient } from "@/lib/supabase/server";
+import { mapVenueRow } from "@/lib/supabase/venues";
+import type { VenueMatch } from "@/lib/types";
 import { notFound } from "next/navigation";
 import { VenueViewTracker } from "./venue-view-tracker";
 
@@ -13,12 +16,14 @@ type VenuePageProps = {
   };
 };
 
+export const revalidate = 300;
+
 export function generateStaticParams() {
-  return venues.map((venue) => ({ id: venue.id }));
+  return fallbackVenues.map((venue) => ({ id: venue.id }));
 }
 
-export default function VenuePage({ params }: VenuePageProps) {
-  const venue = getRecommendedVenues(venues, defaultProfile).find((item) => item.id === params.id);
+export default async function VenuePage({ params }: VenuePageProps) {
+  const venue = await getVenue(params.id);
 
   if (!venue) {
     notFound();
@@ -86,12 +91,29 @@ export default function VenuePage({ params }: VenuePageProps) {
             ))}
           </div>
           <p className="mt-5 text-sm leading-6 text-white/68">
-            This is still MVP logic: simple, visible and easy to test with users before adding a real backend.
+            This is still MVP logic: simple, visible and easy to test with users before making the matching engine more advanced.
           </p>
         </aside>
       </section>
     </main>
   );
+}
+
+async function getVenue(id: string): Promise<VenueMatch | undefined> {
+  if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY) {
+    try {
+      const supabase = await createClient();
+      const { data, error } = await supabase.from("venues").select("*").eq("id", id).eq("is_active", true).single();
+
+      if (!error && data) {
+        return getRecommendedVenues([mapVenueRow(data)], defaultProfile)[0];
+      }
+    } catch {
+      // Fall back to bundled MVP data below.
+    }
+  }
+
+  return getRecommendedVenues(fallbackVenues, defaultProfile).find((item) => item.id === id);
 }
 
 function DetailItem({ icon, label, value }: { icon: ReactNode; label: string; value: string }) {
