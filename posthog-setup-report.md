@@ -1,20 +1,17 @@
 <wizard-report>
 # PostHog post-wizard report
 
-The wizard has completed a deep integration of PostHog analytics into **NITEFY**, a Next.js 14 App Router nightlife venue recommendation app.
+The wizard has completed a deep integration of PostHog analytics into **NITEFY**, a Next.js 14 App Router nightlife venue recommendation app. PostHog was already set up with `posthog-js` installed, a `PHProvider` client component initialising PostHog via environment variables, and a reverse proxy configured in `next.config.mjs`. The main page and venue card component already captured a rich set of user interaction events via a shared `captureEvent` helper.
 
-## Summary of changes
+This session added the one meaningful gap: event tracking on the venue detail page. Since `src/app/venue/[id]/page.tsx` is a server component, a new client component `VenueViewTracker` was created and embedded in the page to fire a `Venue Viewed` event on mount. Environment variables were also refreshed in `.env.local`.
+
+## Files changed
 
 | File | Change |
 |------|--------|
-| `package.json` | Added `posthog-js` dependency |
-| `.env.local` | Added `NEXT_PUBLIC_POSTHOG_KEY` and `NEXT_PUBLIC_POSTHOG_HOST` |
-| `next.config.mjs` | Added `/ingest` reverse proxy rewrites for PostHog (EU region) and `skipTrailingSlashRedirect: true` |
-| `src/app/providers.tsx` | **New file** — `PHProvider` client component that initialises PostHog and wraps the app with `PostHogProvider` |
-| `src/app/layout.tsx` | Wrapped `{children}` with `<PHProvider>` |
-| `src/lib/analytics.ts` | **New file** — `captureEvent()` helper that fires both Vercel Analytics `track()` and `posthog.capture()` simultaneously |
-| `src/app/page.tsx` | Added PostHog event captures for all user interactions (music scan, preferences, location, advanced filters) |
-| `src/components/venue-card.tsx` | Added PostHog event capture on venue link click |
+| `src/app/venue/[id]/venue-view-tracker.tsx` | **New file** — client component that fires `Venue Viewed` on mount |
+| `src/app/venue/[id]/page.tsx` | Import and render `VenueViewTracker` |
+| `.env.local` | Refreshed `NEXT_PUBLIC_POSTHOG_KEY` and `NEXT_PUBLIC_POSTHOG_HOST` |
 
 ## Events tracked
 
@@ -27,17 +24,18 @@ The wizard has completed a deep integration of PostHog analytics into **NITEFY**
 | `Location City Selected` | User manually selects a city from the city picker | `src/app/page.tsx` |
 | `Advanced Filters Opened` | User expands the advanced filters section | `src/app/page.tsx` |
 | `Venue Opened` | User clicks through to a venue detail page from a recommendation card | `src/components/venue-card.tsx` |
+| `Venue Viewed` | User lands on a venue detail page — captures the conversion funnel step after clicking a card | `src/app/venue/[id]/venue-view-tracker.tsx` |
 
 ## Next steps
 
-We've built some insights and a dashboard for you to keep an eye on user behavior, based on the events we just instrumented:
+We've built a new dashboard with five insights for you to track user behaviour:
 
-- **Dashboard — Analytics basics:** https://eu.posthog.com/project/173918/dashboard/665421
-- **Music Scan → Venue Opened Funnel:** https://eu.posthog.com/project/173918/insights/DynXTYgx
-- **Venue Opens Over Time:** https://eu.posthog.com/project/173918/insights/3FAtQvTI
-- **Top Venues Opened:** https://eu.posthog.com/project/173918/insights/NgOXlW5q
-- **Music Scan Provider Split:** https://eu.posthog.com/project/173918/insights/KjTmfUiM
-- **Preference Changes by Field:** https://eu.posthog.com/project/173918/insights/lJHxrblL
+- **Dashboard — Analytics basics:** https://eu.posthog.com/project/173918/dashboard/665553
+- **Venue discovery funnel** (Venue Opened → Venue Viewed): https://eu.posthog.com/project/173918/insights/nulpG9bE
+- **Music scan completion rate** (Music Scan Started → Music Scan Completed): https://eu.posthog.com/project/173918/insights/VGA5BZgA
+- **Preference engagement over time:** https://eu.posthog.com/project/173918/insights/ANQFZUQl
+- **Top venues viewed** (by venue name): https://eu.posthog.com/project/173918/insights/2XQ3ULBa
+- **Music provider preference** (Spotify vs Apple Music): https://eu.posthog.com/project/173918/insights/4u9zvHqg
 
 ### Agent skill
 

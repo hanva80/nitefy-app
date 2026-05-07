@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 import { venues } from "@/data/venues";
 import { defaultProfile, getRecommendedVenues } from "@/lib/recommendation-engine";
 import { notFound } from "next/navigation";
+import { VenueViewTracker } from "./venue-view-tracker";
 
 type VenuePageProps = {
   params: {
@@ -25,6 +26,14 @@ export default function VenuePage({ params }: VenuePageProps) {
 
   return (
     <main className="min-h-screen">
+      <VenueViewTracker
+        venueId={venue.id}
+        venueName={venue.name}
+        matchScore={venue.matchScore}
+        venueType={venue.type}
+        neighborhood={venue.neighborhood}
+        city={venue.city}
+      />
       <section className="relative min-h-[58vh] overflow-hidden">
         <Image
           src={venue.image}
