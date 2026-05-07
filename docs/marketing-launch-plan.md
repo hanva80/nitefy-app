@@ -63,4 +63,4 @@ The winning angle is the one that produces the highest rate of users opening a v
 
 ## Implementation Surface
 
-The in-app version of this plan lives at `/marketing`. Keep that page concise, operational and focused on launch execution rather than broad brand theory.
+Keep this plan as an internal launch document until the team decides to expose a public marketing surface.
