@@ -13,8 +13,8 @@ type VenueCardProps = {
 
 export function VenueCard({ venue, featured = false }: VenueCardProps) {
   return (
-    <article className={`overflow-hidden rounded-lg border border-white/12 bg-[#11141d]/86 shadow-[0_18px_60px_rgba(0,0,0,0.22)] ${featured ? "xl:col-span-2" : ""}`}>
-      <div className={`relative ${featured ? "min-h-[320px]" : "min-h-[240px]"}`}>
+    <article className={`overflow-hidden rounded-lg border border-white/12 bg-[#10131b]/92 shadow-[0_18px_60px_rgba(0,0,0,0.22)] transition hover:border-lime/40 ${featured ? "xl:col-span-2" : ""}`}>
+      <div className={`relative ${featured ? "min-h-[340px]" : "min-h-[250px]"}`}>
         <Image
           src={venue.image}
           alt={`${venue.name} atmosphere`}
@@ -22,15 +22,18 @@ export function VenueCard({ venue, featured = false }: VenueCardProps) {
           sizes={featured ? "(min-width: 1024px) 66vw, 100vw" : "(min-width: 1024px) 33vw, 100vw"}
           className="object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-night via-night/30 to-black/10" />
-        <div className="absolute left-4 top-4 rounded-full bg-lime px-3 py-1 text-xs font-black text-night shadow-glow">{venue.matchScore}% match</div>
+        <div className="absolute inset-0 bg-gradient-to-t from-night via-night/42 to-black/16" />
+        <div className="absolute left-4 top-4 rounded-lg bg-lime px-3 py-2 text-xs font-black text-night shadow-glow">{venue.matchScore}% match</div>
+        <div className="absolute right-4 top-4 rounded-lg border border-white/14 bg-black/46 px-3 py-2 text-xs font-black text-white backdrop-blur">
+          {venue.priceLabel}
+        </div>
         <div className="absolute bottom-0 left-0 right-0 p-4">
           <div className="flex flex-wrap items-center gap-2 text-xs font-semibold uppercase text-white/75">
             <span>{venue.type}</span>
-            <span>•</span>
+            <span className="text-lime">/</span>
             <span>{venue.neighborhood}</span>
           </div>
-          <h3 className="mt-1 text-2xl font-black text-white">{venue.name}</h3>
+          <h3 className="mt-1 text-3xl font-black leading-tight text-white">{venue.name}</h3>
           <p className="mt-2 max-w-xl text-sm font-semibold text-white/82">{venue.visualCue}</p>
         </div>
       </div>
@@ -70,7 +73,7 @@ export function VenueCard({ venue, featured = false }: VenueCardProps) {
             <Clock size={14} />
             {venue.openingHours}
           </div>
-          <p className="text-sm font-black text-white">Why it fits</p>
+          <p className="text-sm font-black text-white">Why it fits tonight</p>
           <div className="mt-2 flex flex-wrap gap-2">
             {venue.matchReasons.map((reason) => (
               <span key={reason} className="rounded-full bg-lime/10 px-3 py-1 text-xs font-bold text-lime">

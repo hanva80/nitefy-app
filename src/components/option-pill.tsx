@@ -9,10 +9,10 @@ export function OptionPill<T extends string>({ label, active, onClick }: OptionP
     <button
       type="button"
       onClick={() => onClick(label)}
-      className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${
+      className={`rounded-full border px-4 py-2 text-sm font-bold transition ${
         active
           ? "border-lime bg-lime text-night shadow-glow"
-          : "border-white/12 bg-white/[0.06] text-white hover:border-white/30"
+          : "border-white/12 bg-white/[0.06] text-white/78 hover:border-lime/40 hover:text-white"
       }`}
     >
       {label}

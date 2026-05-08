@@ -9,7 +9,9 @@ import {
   Navigation,
   Radio,
   SlidersHorizontal,
-  Star
+  Sparkles,
+  Star,
+  Zap
 } from "lucide-react";
 import { OptionPill } from "@/components/option-pill";
 import { VenueCard } from "@/components/venue-card";
@@ -39,7 +41,7 @@ import type { ReactNode } from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 const cityOptions = ["Düsseldorf", "Köln", "Essen"];
-const panelClass = "rounded-lg border border-white/10 bg-[#11141d]/88 p-4 shadow-[0_18px_60px_rgba(0,0,0,0.28)] backdrop-blur";
+const panelClass = "rounded-lg border border-white/10 bg-[#10131b]/92 p-4 shadow-[0_18px_60px_rgba(0,0,0,0.28)] backdrop-blur";
 const spotifyPreviewGenres: MusicStyle[] = ["Hip-hop", "Afrobeats", "R&B"];
 
 type HomeClientProps = {
@@ -172,10 +174,13 @@ export function HomeClient({ initialVenues }: HomeClientProps) {
   return (
     <main className="min-h-screen px-4 py-4 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
-        <header className="sticky top-0 z-20 -mx-4 flex flex-wrap items-center justify-between gap-3 border-b border-white/10 bg-night/88 px-4 py-4 backdrop-blur sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
-          <div>
-            <div className="text-2xl font-black tracking-normal text-white">NITEFY</div>
-            <p className="mt-1 text-sm font-semibold text-white/58">Don&apos;t guess the night. NITEFY it.</p>
+        <header className="sticky top-0 z-20 -mx-4 flex flex-wrap items-center justify-between gap-3 border-b border-white/10 bg-night/90 px-4 py-3 backdrop-blur sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
+          <div className="flex items-center gap-3">
+            <div className="grid h-10 w-10 place-items-center rounded-lg bg-lime text-base font-black text-night shadow-glow">N</div>
+            <div>
+              <div className="text-xl font-black tracking-normal text-white">NITEFY</div>
+              <p className="text-xs font-bold text-white/56">Don&apos;t guess the night. NITEFY it.</p>
+            </div>
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
@@ -183,7 +188,7 @@ export function HomeClient({ initialVenues }: HomeClientProps) {
               <MapPin size={14} className="text-cyan" />
               {city}
             </span>
-            <span className="rounded-full bg-lime px-3 py-2 text-xs font-black text-night">MVP</span>
+            <span className="rounded-full border border-lime/30 bg-lime/12 px-3 py-2 text-xs font-black text-lime">MVP</span>
             <a href="#recommendations" className="rounded-full bg-white px-4 py-2 text-xs font-black text-night transition hover:bg-lime lg:hidden">
               See matches
             </a>
@@ -194,10 +199,14 @@ export function HomeClient({ initialVenues }: HomeClientProps) {
           <aside className="space-y-4 lg:sticky lg:top-24 lg:self-start">
             <section className={panelClass}>
               <StepLabel number="1" label="Music taste" icon={<Headphones size={17} />} />
-              <h1 className="mt-3 text-4xl font-black leading-[0.98] text-white">Tonight starts with your sound.</h1>
-              <p className="mt-3 text-sm leading-6 text-white/68">
-                Connect Spotify and NITEFY builds your nightlife profile from your recent music taste.
-              </p>
+              <h1 className="mt-3 text-[2.45rem] font-black leading-[0.96] text-white sm:text-5xl lg:text-[2.85rem]">
+                Find the place that actually fits tonight.
+              </h1>
+              <div className="mt-4 grid grid-cols-3 overflow-hidden rounded-lg border border-white/10 bg-black/22 text-center">
+                <Metric label="Best fit" value={`${bestMatch?.matchScore ?? 0}%`} tone="lime" />
+                <Metric label="Nearby" value={`${profile.distanceKm}km`} tone="cyan" />
+                <Metric label="Mood" value={profile.vibe.split(" ")[0]} tone="white" />
+              </div>
 
               <div className="mt-5 grid gap-2">
                 <button
@@ -456,53 +465,70 @@ export function HomeClient({ initialVenues }: HomeClientProps) {
           </aside>
 
           <section id="recommendations" className="min-w-0 scroll-mt-24">
-            <div className="mb-4 rounded-lg border border-white/10 bg-[#0d1018]/88 p-4 shadow-[0_18px_60px_rgba(0,0,0,0.24)] backdrop-blur sm:p-5">
-              <div className="flex flex-wrap items-start justify-between gap-4">
-                <div>
-                  <p className="text-xs font-black uppercase text-lime">Your night profile</p>
-                  <h2 className="mt-2 text-3xl font-black leading-tight text-white sm:text-4xl">
-                    {musicTaste ? `${musicTaste.provider} taste, ${profile.vibe.toLowerCase()} vibe` : "Connect Spotify to start"}
+            <div className="mb-4 overflow-hidden rounded-lg border border-white/10 bg-[#0d1018]/92 shadow-[0_18px_70px_rgba(0,0,0,0.30)] backdrop-blur">
+              <div className="grid lg:grid-cols-[minmax(0,1fr)_300px]">
+                <div className="p-5 sm:p-6">
+                  <p className="inline-flex items-center gap-2 rounded-full border border-lime/20 bg-lime/10 px-3 py-1 text-xs font-black uppercase text-lime">
+                    <Sparkles size={14} />
+                    Your night profile
+                  </p>
+                  <h2 className="mt-4 max-w-3xl text-4xl font-black leading-[0.98] text-white sm:text-6xl">
+                    {musicTaste ? `${profile.vibe} with ${musicTaste.topGenres[0]}` : "Pick the right room before you leave."}
                   </h2>
-                  <p className="mt-2 max-w-2xl text-sm leading-6 text-white/64">
+                  <p className="mt-4 max-w-2xl text-sm font-semibold leading-6 text-white/66 sm:text-base">
                     {musicTaste
                       ? musicTaste.nightlifeTranslation
-                      : "You can still use the manual filters, but the clearest NITEFY experience starts with Spotify taste."}
+                      : "Start with Spotify or tune the filters manually. NITEFY ranks venues by sound, vibe, distance, budget and dress code."}
                   </p>
-                </div>
-                <div className="grid min-w-[150px] grid-cols-2 overflow-hidden rounded-lg border border-white/10 bg-white/[0.05] text-center">
-                  <div className="border-r border-white/10 px-3 py-3">
-                    <p className="text-[10px] font-black uppercase text-lime">Best</p>
-                    <p className="mt-1 text-2xl font-black text-white">{bestMatch?.matchScore ?? 0}%</p>
-                  </div>
-                  <div className="px-3 py-3">
-                    <p className="text-[10px] font-black uppercase text-cyan">Rating</p>
-                    <p className="mt-1 flex items-center justify-center gap-1 text-2xl font-black text-white">
-                      <Star size={16} className="fill-lime text-lime" />
-                      {bestMatch?.rating.toFixed(1) ?? "-"}
-                    </p>
+
+                  <div className="mt-5 flex flex-wrap gap-2">
+                    {profile.music.slice(0, 4).map((style) => (
+                      <span key={style} className="rounded-full bg-white/[0.08] px-3 py-1 text-xs font-bold text-white/78">
+                        {style}
+                      </span>
+                    ))}
+                    <span className="rounded-full bg-white/[0.08] px-3 py-1 text-xs font-bold text-white/78">{profile.budget} budget</span>
+                    <span className="rounded-full bg-white/[0.08] px-3 py-1 text-xs font-bold text-white/78">{profile.dressCode}</span>
                   </div>
                 </div>
-              </div>
 
-              <div className="mt-4 flex flex-wrap gap-2">
-                {profile.music.slice(0, 4).map((style) => (
-                  <span key={style} className="rounded-full bg-white/[0.08] px-3 py-1 text-xs font-bold text-white/78">
-                    {style}
-                  </span>
-                ))}
-                <span className="rounded-full bg-white/[0.08] px-3 py-1 text-xs font-bold text-white/78">{profile.budget} budget</span>
-                <span className="rounded-full bg-white/[0.08] px-3 py-1 text-xs font-bold text-white/78">{profile.distanceKm} km radius</span>
-              </div>
-
-              {musicTaste ? (
-                <div className="mt-4 grid gap-2 sm:grid-cols-3">
-                  {musicTaste.recommendationImpact.map((impact) => (
-                    <div key={impact} className="rounded-lg border border-white/10 bg-white/[0.05] p-3 text-sm font-semibold leading-5 text-white/72">
-                      {impact}
+                <div className="border-t border-white/10 bg-white/[0.035] p-5 lg:border-l lg:border-t-0">
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <p className="text-xs font-black uppercase text-white/46">Top match</p>
+                      <p className="mt-1 text-xl font-black text-white">{bestMatch?.name ?? "No venue"}</p>
                     </div>
-                  ))}
+                    <div className="grid h-16 w-16 place-items-center rounded-lg bg-lime text-2xl font-black text-night shadow-glow">
+                      {bestMatch?.matchScore ?? 0}
+                    </div>
+                  </div>
+
+                  <div className="mt-4 grid grid-cols-2 gap-2">
+                    <div className="rounded-lg bg-black/22 p-3">
+                      <p className="text-[10px] font-black uppercase text-cyan">Rating</p>
+                      <p className="mt-1 flex items-center gap-1 text-xl font-black text-white">
+                        <Star size={15} className="fill-lime text-lime" />
+                        {bestMatch?.rating.toFixed(1) ?? "-"}
+                      </p>
+                    </div>
+                    <div className="rounded-lg bg-black/22 p-3">
+                      <p className="text-[10px] font-black uppercase text-lime">Distance</p>
+                      <p className="mt-1 text-xl font-black text-white">{bestMatch?.distanceKm.toFixed(1) ?? "-"} km</p>
+                    </div>
+                  </div>
+
+                  {musicTaste ? (
+                    <div className="mt-4 space-y-2">
+                      {musicTaste.recommendationImpact.slice(0, 2).map((impact) => (
+                        <div key={impact} className="flex gap-2 rounded-lg border border-white/10 bg-black/18 p-3 text-sm font-semibold leading-5 text-white/72">
+                          <Zap size={15} className="mt-0.5 shrink-0 text-lime" />
+                          <span>{impact}</span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : null}
                 </div>
-              ) : null}
+              </div>
             </div>
 
             <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
@@ -531,6 +557,17 @@ function StepLabel({ number, label, icon }: { number: string; label: string; ico
       <span className="grid h-6 w-6 place-items-center rounded-full bg-lime text-night">{number}</span>
       <span className="text-lime">{label}</span>
       <span className="text-cyan">{icon}</span>
+    </div>
+  );
+}
+
+function Metric({ label, value, tone }: { label: string; value: string; tone: "lime" | "cyan" | "white" }) {
+  const toneClass = tone === "lime" ? "text-lime" : tone === "cyan" ? "text-cyan" : "text-white";
+
+  return (
+    <div className="border-r border-white/10 px-2 py-3 last:border-r-0">
+      <p className="text-[10px] font-black uppercase text-white/42">{label}</p>
+      <p className={`mt-1 truncate text-lg font-black ${toneClass}`}>{value}</p>
     </div>
   );
 }

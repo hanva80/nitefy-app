@@ -1,0 +1,108 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1350" viewBox="0 0 1080 1350" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1080" y2="1350" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#090A12"/>
+      <stop offset="0.55" stop-color="#11131D"/>
+      <stop offset="1" stop-color="#0B1016"/>
+    </linearGradient>
+    <linearGradient id="venue" x1="0" y1="0" x2="320" y2="150" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#46246C"/>
+      <stop offset="1" stop-color="#FF5C5C"/>
+    </linearGradient>
+    <filter id="shadow" x="-80" y="-80" width="1240" height="1510" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="34" stdDeviation="44" flood-color="#000000" flood-opacity="0.46"/>
+    </filter>
+  </defs>
+  <style>text{font-family:Inter,Arial,sans-serif}</style>
+  <rect width="1080" height="1350" fill="url(#bg)"/>
+  <rect x="-80" y="-40" width="1240" height="337.5" fill="#C8FF3D" opacity="0.06"/>
+  <rect x="-120" y="297" width="453.59999999999997" height="918.0000000000001" fill="#56D6FF" opacity="0.075"/>
+  <rect x="777.6" y="243" width="367.20000000000005" height="783" fill="#FF5C5C" opacity="0.055"/>
+  
+  <rect x="76" y="76" width="64" height="64" rx="14" fill="#C8FF3D"/>
+  <text x="101" y="119" fill="#090A12" font-size="28" font-weight="900">N</text>
+  <text x="162" y="104" fill="white" font-size="34" font-weight="900">NITEFY</text>
+  <text x="162" y="136" fill="white" opacity="0.58" font-size="18" font-weight="700">Don't guess the night. NITEFY it.</text>
+  <text x="76" y="310" fill="#C8FF3D" font-size="20" font-weight="900" letter-spacing="1.5">MOBILE PREVIEW</text>
+  <text x="76" y="405" fill="white" font-size="78" font-weight="900">Your night,</text>
+  <text x="76" y="488" fill="white" font-size="78" font-weight="900">matched by</text>
+  <text x="76" y="571" fill="white" font-size="78" font-weight="900">your music.</text>
+  <text x="80" y="665" fill="white" opacity="0.68" font-size="27" font-weight="500">A mobile-first nightlife app for finding the right venue tonight.</text>
+  <rect x="80" y="748" width="310" height="66" rx="33" fill="#C8FF3D"/>
+  <text x="126" y="790" fill="#090A12" font-size="22" font-weight="900">Join early testers</text>
+  
+  <g filter="url(#shadow)">
+    <rect x="570" y="110" width="390" height="844" rx="48" fill="#05060B" stroke="white" stroke-opacity="0.2"/>
+    <clipPath id="clip-570-110"><rect x="586" y="126" width="358" height="812" rx="36"/></clipPath>
+    <g clip-path="url(#clip-570-110)">
+      <rect x="586" y="126" width="358" height="812" fill="#090A12"/>
+      <rect x="586" y="126" width="358" height="180" fill="#C8FF3D" opacity="0.055"/>
+      <rect x="586" y="240" width="130" height="620" fill="#56D6FF" opacity="0.055"/>
+      <rect x="728" y="140" width="74" height="6" rx="3" fill="white" opacity="0.22"/>
+      <text x="612" y="173" fill="white" opacity="0.72" font-size="11" font-weight="700">22:48</text>
+      <text x="868" y="173" fill="white" opacity="0.72" font-size="11" font-weight="700">5G</text>
+
+      <rect x="604" y="188" width="322" height="50" rx="16" fill="#090A12" opacity="0.44" stroke="white" stroke-opacity="0.08"/>
+      <rect x="618" y="198" width="30" height="30" rx="8" fill="#C8FF3D"/>
+      <text x="629" y="219" fill="#090A12" font-size="15" font-weight="900">N</text>
+      <text x="660" y="214" fill="white" font-size="17" font-weight="900">NITEFY</text>
+      <text x="660" y="229" fill="white" opacity="0.52" font-size="9" font-weight="700">Don't guess the night.</text>
+      <rect x="884" y="198" width="30" height="30" rx="15" fill="white" opacity="0.08" stroke="white" stroke-opacity="0.12"/>
+      <circle cx="899" cy="213" r="5" fill="#C8FF3D"/>
+
+      <text x="610" y="298" fill="white" font-size="31" font-weight="900">Find your night</text>
+      <text x="610" y="334" fill="white" font-size="31" font-weight="900">in Dusseldorf</text>
+      <text x="610" y="378" fill="white" opacity="0.68" font-size="13" font-weight="500">Venues matched to your music taste, vibe and budget.</text>
+
+      <rect x="610" y="414" width="310" height="56" rx="14" fill="#C8FF3D"/>
+      <text x="632" y="448" fill="#090A12" font-size="18" font-weight="900">Connect Spotify</text>
+      <text x="632" y="462" fill="#090A12" opacity="0.65" font-size="10" font-weight="700">Match from your real taste</text>
+      <text x="896" y="450" fill="#090A12" font-size="18" font-weight="900">-&gt;</text>
+
+      
+      <rect x="610" y="506" width="78" height="34" rx="17" fill="#C8FF3D" opacity="1" stroke="#C8FF3D" stroke-opacity="1"/>
+      <text x="624" y="528" fill="#090A12" opacity="1" font-size="12" font-weight="900">Hip-hop</text>
+      
+      <rect x="696" y="506" width="88" height="34" rx="17" fill="white" opacity="0.075" stroke="white" stroke-opacity="0.12"/>
+      <text x="710" y="528" fill="white" opacity="0.78" font-size="12" font-weight="700">Afrobeat</text>
+      
+      <rect x="792" y="506" width="78" height="34" rx="17" fill="white" opacity="0.075" stroke="white" stroke-opacity="0.12"/>
+      <text x="806" y="528" fill="white" opacity="0.78" font-size="12" font-weight="700">Techno</text>
+      
+      <rect x="610" y="560" width="108" height="34" rx="17" fill="#C8FF3D" opacity="1" stroke="#C8FF3D" stroke-opacity="1"/>
+      <text x="624" y="582" fill="#090A12" opacity="1" font-size="12" font-weight="900">High energy</text>
+      
+      <rect x="726" y="560" width="64" height="34" rx="17" fill="white" opacity="0.075" stroke="white" stroke-opacity="0.12"/>
+      <text x="740" y="582" fill="white" opacity="0.78" font-size="12" font-weight="700">Chill</text>
+      
+      <rect x="798" y="560" width="112" height="34" rx="17" fill="white" opacity="0.075" stroke="white" stroke-opacity="0.12"/>
+      <text x="812" y="582" fill="white" opacity="0.78" font-size="12" font-weight="700">Underground</text>
+
+      <rect x="610" y="620" width="310" height="66" rx="14" fill="#10131B" stroke="white" stroke-opacity="0.1"/>
+      <text x="626" y="644" fill="white" opacity="0.86" font-size="12" font-weight="900">Distance</text>
+      <text x="872" y="644" fill="#C8FF3D" font-size="12" font-weight="900">8 km</text>
+      <rect x="626" y="668" width="270" height="8" rx="4" fill="white" opacity="0.12"/>
+      <rect x="626" y="668" width="158" height="8" rx="4" fill="#C8FF3D"/>
+      <circle cx="788" cy="672" r="13" fill="#C8FF3D"/>
+
+      <text x="610" y="744" fill="white" font-size="21" font-weight="900">Recommended tonight</text>
+      <text x="872" y="744" fill="#56D6FF" font-size="10" font-weight="900">Swipe</text>
+      <rect x="610" y="766" width="302" height="150" rx="16" fill="#10131B" stroke="#C8FF3D" stroke-opacity="0.34"/>
+      <rect x="610" y="766" width="302" height="74" rx="16" fill="url(#venue)"/>
+      <rect x="624" y="780" width="72" height="30" rx="15" fill="#C8FF3D"/>
+      <text x="644" y="800" fill="#090A12" font-size="11" font-weight="900">92%</text>
+      <rect x="850" y="780" width="48" height="30" rx="15" fill="black" opacity="0.5"/>
+      <text x="860" y="800" fill="white" font-size="10" font-weight="700">4.6</text>
+      <text x="626" y="864" fill="white" font-size="22" font-weight="900">SilQ Club</text>
+      <text x="626" y="890" fill="#56D6FF" font-size="12" font-weight="700">Altstadt · 1.8 km</text>
+      <text x="626" y="914" fill="white" opacity="0.68" font-size="12" font-weight="500">Packed dance floor, polished fits and hip-hop heat.</text>
+
+      <rect x="586" y="866" width="358" height="72" fill="#090A12" opacity="0.96" stroke="white" stroke-opacity="0.1"/>
+      <text x="624" y="900" fill="#C8FF3D" font-size="13" font-weight="800" text-anchor="middle">Home</text>
+      <text x="712" y="900" fill="white" opacity="0.48" font-size="13" font-weight="800" text-anchor="middle">Matches</text>
+      <text x="804" y="900" fill="white" opacity="0.48" font-size="13" font-weight="800" text-anchor="middle">Map</text>
+      <text x="890" y="900" fill="white" opacity="0.48" font-size="13" font-weight="800" text-anchor="middle">Profile</text>
+    </g>
+  </g>
+
+</svg>
